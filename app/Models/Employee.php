@@ -18,6 +18,8 @@ class Employee extends Model
         'company_id',
         'department_id',
         'position',
+        'user_id',
+        'location_id',
     ];
 
     // Relationship dengan Company dan Department
@@ -30,4 +32,15 @@ class Employee extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

@@ -12,6 +12,8 @@ export interface Employee {
     department_id: number;
     company?: Company;
     department?: Department;
+    user_id: number;
+    location_id: number;
     created_at?: string;
     updated_at?: string;
 }

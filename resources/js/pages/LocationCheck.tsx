@@ -31,7 +31,6 @@ export default function LocationCheck({ locations }: PageProps) {
                 const lng = +position.coords.longitude.toFixed(6);
                 setCurrentLocation({ lat, lng });
 
-                // Calculate distances
                 const newDistances: Record<number, { distance: number; status: string }> = {};
                 locations.forEach(loc => {
                     const distance = getDistance(lat, lng, loc.latitude, loc.longitude);
@@ -41,8 +40,7 @@ export default function LocationCheck({ locations }: PageProps) {
                     };
                 });
                 setDistances(newDistances);
-                
-                // Update isInRadius state if a location is selected
+
                 if (selectedLocation) {
                     setIsInRadius(newDistances[selectedLocation]?.status === 'Dalam Radius');
                 }
@@ -70,44 +68,41 @@ export default function LocationCheck({ locations }: PageProps) {
     }
 
     function handleClockIn() {
-        // Implement clock-in logic here
         alert(`Clock-In berjaya untuk lokasi ID: ${selectedLocation}`);
     }
 
     function handleClockOut() {
-        // Implement clock-out logic here
         alert(`Clock-Out berjaya untuk lokasi ID: ${selectedLocation}`);
     }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Semakan Lokasi & Jarak" />
 
-                <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                    <Head title="Semakan Lokasi & Jarak" />
+                <div className="py-6 px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-5xl mx-auto">
+                        
+                            
+                            
+                                <h2 className="font-semibold text-xl leading-tight">
+                                    Semakan Lokasi & Jarak
+                                </h2>
 
-                    <div className="py-12">
-                        <div className="max-w-5xl mx-auto sm:px-6 lg:px-8">
-                            <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                                <div className="p-6 text-gray-900 space-y-6">
-                                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                                        Semakan Lokasi & Jarak
-                                    </h2>
+                                {/* Lokasi Semasa Pengguna */}
+                                <div className="py-6 space-y-2">
+                                    <h3 className="text-lg font-semibold">Lokasi Semasa Pengguna</h3>
+                                    <p>Latitude: <span>{currentLocation.lat}</span></p>
+                                    <p>Longitude: <span>{currentLocation.lng}</span></p>
+                                </div>
 
-                                    {/* Lokasi Semasa Pengguna */}
-                                    <div className="border rounded p-4 bg-blue-50 space-y-2">
-                                        <h3 className="text-lg font-semibold">Lokasi Semasa Pengguna</h3>
-                                        <p>Latitude: <span>{currentLocation.lat}</span></p>
-                                        <p>Longitude: <span>{currentLocation.lng}</span></p>
-                                    </div>
+                                {/* Senarai Lokasi */}
+                                
+                                    <h3 className="text-lg font-semibold">Senarai Lokasi Dalam Sistem</h3>
 
-                                    {/* Senarai Lokasi */}
-                                    <div className="border rounded p-4 bg-gray-50 space-y-2">
-                                        <h3 className="text-lg font-semibold">Senarai Lokasi Dalam Sistem</h3>
-
-                                        <table className="w-full text-left table-auto border mt-4">
-                                            <thead>
-                                                <tr className="bg-gray-200">
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full text-left table-auto border mt-4 text-sm">
+                                            <thead className="bg-muted sticky top-0 z-10">
+                                                <tr>
                                                     <th className="px-4 py-2">Nama</th>
                                                     <th className="px-4 py-2">Latitude</th>
                                                     <th className="px-4 py-2">Longitude</th>
@@ -117,13 +112,13 @@ export default function LocationCheck({ locations }: PageProps) {
                                                     <th className="px-4 py-2">Tindakan</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody className='text-gray-900'>
                                                 {locations.map((loc) => (
-                                                    <tr 
-                                                        key={loc.id} 
+                                                    <tr
+                                                        key={loc.id}
                                                         className={distances[loc.id]?.status === 'Dalam Radius' ? 'bg-green-100' : 'bg-red-50'}
                                                     >
-                                                        <td className="px-4 py-2">{loc.name}</td>
+                                                        <td className="px-4 py-2 break-words">{loc.name}</td>
                                                         <td className="px-4 py-2">{loc.latitude}</td>
                                                         <td className="px-4 py-2">{loc.longitude}</td>
                                                         <td className="px-4 py-2">{loc.radius_meters}</td>
@@ -131,12 +126,17 @@ export default function LocationCheck({ locations }: PageProps) {
                                                             {distances[loc.id]?.distance ? distances[loc.id].distance.toFixed(2) : '-'}
                                                         </td>
                                                         <td className="px-4 py-2">
-                                                            {distances[loc.id]?.status === 'Dalam Radius' ? '✅ Dalam Radius' : '❌ Luar Radius'}
+                                                            {distances[loc.id]?.status === 'Dalam Radius'
+                                                                ? '✅ Dalam Radius'
+                                                                : '❌ Luar Radius'}
                                                         </td>
                                                         <td className="px-4 py-2">
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleLocationSelect(loc.id)}
-                                                                className={`px-3 py-1 rounded ${selectedLocation === loc.id ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                                                                className={`px-3 py-1 rounded text-sm ${selectedLocation === loc.id
+                                                                    ? 'bg-blue-500 text-white'
+                                                                    : 'bg-gray-200'
+                                                                    }`}
                                                             >
                                                                 Pilih
                                                             </button>
@@ -146,43 +146,55 @@ export default function LocationCheck({ locations }: PageProps) {
                                             </tbody>
                                         </table>
                                     </div>
+                                
 
-                                    {/* Clock-In/Out Section */}
-                                    {selectedLocation && (
-                                        <div className="border rounded p-4 bg-purple-50 space-y-4">
-                                            <h3 className="text-lg font-semibold">Tindakan</h3>
-                                            <div className="flex items-center space-x-4">
-                                                <p>Lokasi Terpilih: <span className="font-medium">
+                                {/* Clock-In/Out Section */}
+                                {selectedLocation && (
+                                    <div className="border rounded p-4 bg-purple-50 space-y-4 text-gray-900">
+                                        <h3 className="text-lg font-semibold">Tindakan</h3>
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                                            <p>
+                                                Lokasi Terpilih:{' '}
+                                                <span className="font-medium">
                                                     {locations.find(loc => loc.id === selectedLocation)?.name}
-                                                </span></p>
-                                                
-                                                <button
-                                                    onClick={handleClockIn}
-                                                    disabled={!isInRadius}
-                                                    className={`px-4 py-2 rounded text-white ${isInRadius ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`}
-                                                >
-                                                    Clock-In
-                                                </button>
-                                                
-                                                <button
-                                                    onClick={handleClockOut}
-                                                    disabled={!isInRadius}
-                                                    className={`px-4 py-2 rounded text-white ${isInRadius ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-400 cursor-not-allowed'}`}
-                                                >
-                                                    Clock-Out
-                                                </button>
-                                            </div>
-                                            {!isInRadius && selectedLocation && (
-                                                <p className="text-red-500">Anda perlu berada dalam radius untuk melakukan Clock-In/Out</p>
-                                            )}
+                                                </span>
+                                            </p>
+
+                                            <button
+                                                onClick={handleClockIn}
+                                                disabled={!isInRadius}
+                                                className={`px-4 py-2 rounded text-white text-sm ${isInRadius
+                                                    ? 'bg-green-500 hover:bg-green-600'
+                                                    : 'bg-gray-400 cursor-not-allowed'
+                                                    }`}
+                                            >
+                                                Clock-In
+                                            </button>
+
+                                            <button
+                                                onClick={handleClockOut}
+                                                disabled={!isInRadius}
+                                                className={`px-4 py-2 rounded text-white text-sm ${isInRadius
+                                                    ? 'bg-red-500 hover:bg-red-600'
+                                                    : 'bg-gray-400 cursor-not-allowed'
+                                                    }`}
+                                            >
+                                                Clock-Out
+                                            </button>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                                        {!isInRadius && (
+                                            <p className="text-red-500 text-sm">
+                                                Anda perlu berada dalam radius untuk melakukan Clock-In/Out
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            
+                            
+                        
                     </div>
-                    
                 </div>
+
         </AppLayout>
     );
 }

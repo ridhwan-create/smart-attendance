@@ -12,9 +12,11 @@ interface Props {
     employee: Employee;
     companies: Company[];
     departments: Department[];
+    users: { id: number; name: string; email: string }[];
+    locations: { id: number; name: string }[];
 }
 
-export default function EmployeeEdit({ employee, companies, departments }: Props) {
+export default function EmployeeEdit({ employee, companies, departments, users, locations }: Props) {
     const { data, setData, put, processing, errors } = useForm({
         ic_number: employee.ic_number ?? '',
         name: employee.name ?? '',
@@ -23,6 +25,8 @@ export default function EmployeeEdit({ employee, companies, departments }: Props
         position: employee.position ?? '',
         company_id: String(employee.company_id ?? ''),
         department_id: String(employee.department_id ?? ''),
+        user_id: String(employee.user_id ?? ''),
+        location_id: String(employee.location_id ?? ''),
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -45,6 +49,33 @@ export default function EmployeeEdit({ employee, companies, departments }: Props
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
+                      <Label htmlFor="name">Name</Label>
+                      <Select
+                        onValueChange={(val) => {
+                          const selectedUser = users.find((user) => user.name === val);
+                          if (selectedUser) {
+                            setData('name', selectedUser.name);
+                            setData('user_id', String(selectedUser.id)); // auto-set user_id
+                            setData('email', selectedUser.email); // auto-set email
+                          }
+                        }}
+                        value={data.name}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a name" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {users.map((user) => (
+                            <SelectItem key={user.id} value={user.name}>
+                              {user.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <InputError message={errors.name} />
+                    </div>
+
+                    <div>
                         <Label htmlFor="ic_number">IC Number</Label>
                         <Input
                             id="ic_number"
@@ -54,7 +85,7 @@ export default function EmployeeEdit({ employee, companies, departments }: Props
                         <InputError message={errors.ic_number} />
                     </div>
 
-                    <div>
+                    {/* <div>
                         <Label htmlFor="name">Name</Label>
                         <Input
                             id="name"
@@ -62,7 +93,7 @@ export default function EmployeeEdit({ employee, companies, departments }: Props
                             onChange={(e) => setData('name', e.target.value)}
                         />
                         <InputError message={errors.name} />
-                    </div>
+                    </div> */}
 
                     <div>
                         <Label htmlFor="email">Email</Label>
@@ -71,6 +102,7 @@ export default function EmployeeEdit({ employee, companies, departments }: Props
                             type="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
+                            readOnly
                         />
                         <InputError message={errors.email} />
                     </div>
@@ -133,6 +165,47 @@ export default function EmployeeEdit({ employee, companies, departments }: Props
                             </SelectContent>
                         </Select>
                         <InputError message={errors.department_id} />
+                    </div>
+
+                    <div>
+                        <Label htmlFor="user_id">User (for Admin Reference)</Label>
+                        <Select
+                            onValueChange={(val) => setData('user_id', val)}
+                            value={data.user_id}
+                            disabled
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a user" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {users.map((user) => (
+                                    <SelectItem key={user.id} value={String(user.id)}>
+                                        {user.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.user_id} />
+                    </div>
+                    
+                    <div>
+                        <Label htmlFor="location_id">Location</Label>
+                        <Select
+                            onValueChange={(val) => setData('location_id', val)}
+                            value={data.location_id}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a location" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {locations.map((loc) => (
+                                    <SelectItem key={loc.id} value={String(loc.id)}>
+                                        {loc.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.location_id} />
                     </div>
 
                     <div className="pt-4">

@@ -30,4 +30,10 @@ class Location extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
+
 }

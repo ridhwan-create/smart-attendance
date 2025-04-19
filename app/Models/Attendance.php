@@ -22,6 +22,8 @@ class Attendance extends Model
         'work_schedule_type_id',
         'created_by',
         'updated_by',
+        'latitude',
+        'longitude',
     ];
 
     protected $dates = ['check_in_time', 'check_out_time'];
