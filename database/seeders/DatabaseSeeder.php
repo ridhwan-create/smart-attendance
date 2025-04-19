@@ -12,16 +12,21 @@ use Database\Seeders\AttendanceSeeder;
 
 class DatabaseSeeder extends Seeder
 {
+    // public function run(): void
+    // {
+    //     $this->call([
+    //         CompanySeeder::class,
+    //         DepartmentSeeder::class,
+    //         WorkScheduleTypeSeeder::class,
+    //         LocationSeeder::class,
+    //         EmployeeSeeder::class,
+    //         AttendanceSeeder::class,
+    //     ]);
+    // }
     public function run(): void
     {
         $this->call([
-            CompanySeeder::class,
-            DepartmentSeeder::class,
-            WorkScheduleTypeSeeder::class,
-            LocationSeeder::class,
-            EmployeeSeeder::class,
-            AttendanceSeeder::class,
+            LocationsTableSeeder::class,
         ]);
     }
-    
 }

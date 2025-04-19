@@ -16,15 +16,25 @@ import { SVGAttributes } from 'react';
 
 export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
   return (
-<svg {...props} viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-  <path 
-    fill="#FF6B6B" 
-    d="M208 32H184V24a8 8 0 0 0-16 0v8H88V24a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16Z"
-  />
-  <path 
-    fill="#FFE66D" 
-    d="M208 64v32H48V64h160Z"
-  />
-</svg>
+    <svg {...props} viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+      {/* Shield base */}
+      <path 
+        fill="#10b981" 
+        d="M224 56v58a94 94 0 0 1-37 75l-51 34-51-34a94 94 0 0 1-37-75V56a8 8 0 0 1 8-8h160a8 8 0 0 1 8 8z"
+      />
+      
+      {/* Checkmark */}
+      <path 
+        fill="#ffffff" 
+        d="M172 96l-52 52-20-20a8 8 0 0 0-11 11l26 26a8 8 0 0 0 11 0l58-58a8 8 0 0 0-11-11z"
+      />
+      
+      {/* Pulse waves */}
+      <path 
+        fill="#ffffff" 
+        fill-opacity="0.3" 
+        d="M128 32h-16v16h16V32zm32 0h-16v16h16V32zm32 0h-16v16h16V32z"
+      />
+    </svg>
   );
 }
