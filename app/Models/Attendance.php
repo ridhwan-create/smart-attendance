@@ -10,12 +10,31 @@ class Attendance extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // protected $fillable = [
+    //     'employee_id',
+    //     'ic_number',
+    //     'name',
+    //     'check_in_time',
+    //     'check_out_time',
+    //     'location_id',
+    //     'notes',
+    //     'company_id',
+    //     'work_schedule_type_id',
+    //     'created_by',
+    //     'updated_by',
+    //     'latitude',
+    //     'longitude',
+    // ];
     protected $fillable = [
         'employee_id',
         'ic_number',
         'name',
         'check_in_time',
+        'is_late',
+        'late_duration',
         'check_out_time',
+        'is_early_leave',
+        'early_leave_duration',
         'location_id',
         'notes',
         'company_id',
@@ -24,7 +43,7 @@ class Attendance extends Model
         'updated_by',
         'latitude',
         'longitude',
-    ];
+    ];    
 
     protected $dates = ['check_in_time', 'check_out_time'];
 
