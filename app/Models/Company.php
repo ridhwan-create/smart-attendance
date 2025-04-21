@@ -22,4 +22,28 @@ class Company extends Model
     {
         return $this->hasMany(Department::class);
     }
+
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
+
+    public function locations()
+    {
+        return $this->hasMany(Location::class);
+    }    
+
+    public function attendances()
+    {
+        return $this->hasManyThrough(
+            \App\Models\Attendance::class,
+            \App\Models\Employee::class,
+            'company_id',    // Foreign key on Employee table
+            'employee_id',   // Foreign key on Attendance table
+            'id',            // Local key on Company table
+            'id'             // Local key on Employee table
+        );
+    }
+    
+
 }

@@ -10,6 +10,8 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\WorkScheduleTypeController;
 use App\Http\Controllers\AttendanceRegisterController;
 use App\Http\Controllers\AttendanceSelfController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AttendanceSummaryController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -19,6 +21,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+    
+Route::get('/attendance-summary', AttendanceSummaryController::class)
+    ->name('attendance.summary');
+
 
     Route::resource('attendances', AttendanceController::class);
     Route::resource('employees', EmployeeController::class);

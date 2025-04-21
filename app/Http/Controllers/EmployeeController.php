@@ -46,7 +46,7 @@ class EmployeeController extends Controller
             'company_id' => 'required|exists:companies,id',
             'department_id' => 'required|exists:departments,id',
             'user_id' => 'required|unique:employees,user_id',
-            'location_id' => 'required|unique:employees,location_id',
+            'location_id' => 'required|string|max:2',
         ]);
 
         Employee::create([

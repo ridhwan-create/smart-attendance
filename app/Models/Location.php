@@ -11,6 +11,8 @@ class Location extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'company_id',
+        'work_schedule_type_id',
         'name',
         'address',
         'latitude',
@@ -34,6 +36,11 @@ class Location extends Model
     public function employees()
     {
         return $this->hasMany(Employee::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 
 }

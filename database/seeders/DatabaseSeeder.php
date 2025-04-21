@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            WorkingHoursTableSeeder::class,
+            AttendanceSeeder::class,
         ]);        
     }
 }
