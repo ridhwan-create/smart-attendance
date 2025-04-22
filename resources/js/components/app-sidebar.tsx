@@ -6,6 +6,16 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
+import {
+    Building2,
+    MapPin,
+    MapPinCheck,
+    Users,
+    CalendarCheck,
+    Clock,
+    FileClock,
+    Settings,
+  } from 'lucide-react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -13,6 +23,41 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
+    {
+        title: 'Companies',
+        href: '/companies',
+        icon: Building2,
+      },
+      {
+        title: 'Locations',
+        href: '/locations',
+        icon: MapPin,
+      },
+      {
+        title: 'Locations Checker',
+        href: '/location-check',
+        icon: MapPinCheck,
+      },
+      {
+        title: 'Employees',
+        href: '/employees',
+        icon: Users,
+      },
+      {
+        title: 'Attendances',
+        href: '/attendances',
+        icon: CalendarCheck,
+      },
+      {
+        title: 'Working Hours',
+        href: '/working-hours',
+        icon: Clock,
+      },
+      {
+        title: 'Work Schedule Types',
+        href: '/work-schedule-types',
+        icon: FileClock,
+      },
 ];
 
 const footerNavItems: NavItem[] = [

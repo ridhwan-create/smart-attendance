@@ -50,3 +50,4 @@ export * from './location';
 export * from './work-schedule-type';
 export * from './employee';
 export * from './attendance';
+export * from './pagination';

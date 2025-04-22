@@ -9,20 +9,55 @@ use Inertia\Response;
 
 class LocationController extends Controller
 {
-    public function checkLocation()
-    {
-        $locations = Location::all(); // Gantikan dengan model dan query anda
+    // public function checkLocation()
+    // {
+    //     $locations = Location::all(); // Gantikan dengan model dan query anda
         
+    //     return Inertia::render('LocationCheck', [
+    //         'locations' => $locations,
+    //     ]);
+    // }
+    public function checkLocation(Request $request): Response
+    {
+        $search = $request->query('search');
+    
+        $locations = Location::query()
+            ->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%"))
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+    
         return Inertia::render('LocationCheck', [
             'locations' => $locations,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
-    public function index(): Response
+
+    // public function index(): Response
+    // {
+    //     $locations = Location::all();
+
+    //     return Inertia::render('locations/index', [
+    //         'locations' => $locations,
+    //     ]);
+    // }
+    public function index(Request $request): Response
     {
-        $locations = Location::all();
+        $search = $request->query('search');
+
+        $locations = Location::query()
+            ->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%"))
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('locations/index', [
             'locations' => $locations,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

@@ -15,14 +15,45 @@ use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
-    public function index(): Response
-    {
-        $attendances = Attendance::with(['employee', 'company', 'location', 'workScheduleType'])->get();
+    // public function index(): Response
+    // {
+    //     $attendances = Attendance::with(['employee', 'company', 'location', 'workScheduleType'])->get();
 
+    //     return Inertia::render('attendances/index', [
+    //         'attendances' => $attendances,
+    //     ]);
+    // }
+    public function index(Request $request): Response
+    {
+        $search = $request->input('search');
+    
+        $attendances = Attendance::with(['employee', 'company', 'location', 'workScheduleType'])
+            ->when($search, fn ($query) =>
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('employee', fn ($q2) =>
+                        $q2->where('name', 'like', "%{$search}%")
+                           ->orWhere('ic_number', 'like', "%{$search}%")
+                    )
+                    ->orWhereHas('location', fn ($q2) =>
+                        $q2->where('name', 'like', "%{$search}%")
+                    )
+                    ->orWhereHas('company', fn ($q2) =>
+                    $q2->where('company_name', 'like', "%{$search}%")
+                );
+                })
+            )
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+    
         return Inertia::render('attendances/index', [
             'attendances' => $attendances,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
-    }
+    }    
+    
 
     // public function create(): Response
     // {

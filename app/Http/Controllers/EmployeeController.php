@@ -13,14 +13,34 @@ use App\Models\Location;
 
 class EmployeeController extends Controller
 {
-    public function index(): Response
+    // public function index(): Response
+    // {
+    //     $employees = Employee::with(['company', 'department'])->get();
+
+    //     return Inertia::render('employees/index', [
+    //         'employees' => $employees,
+    //     ]);
+    // }
+    public function index(Request $request): Response
     {
-        $employees = Employee::with(['company', 'department'])->get();
+        $search = $request->input('search');
+
+        $employees = Employee::with(['company', 'department'])
+            ->when($search, fn ($query) =>
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%"))
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('employees/index', [
             'employees' => $employees,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
+
 
     public function create(): Response
     {

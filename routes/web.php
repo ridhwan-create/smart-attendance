@@ -14,16 +14,20 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AttendanceSummaryController;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('auth/login');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    // Route::get('dashboard', function () {
+    //     return Inertia::render('dashboard');
+    // })->name('dashboard');
+
+    Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)
+    ->name('dashboard');
+
     
-Route::get('/attendance-summary', AttendanceSummaryController::class)
-    ->name('attendance.summary');
+// Route::get('/attendance-summary', AttendanceSummaryController::class)
+//     ->name('attendance.summary');
 
 
     Route::resource('attendances', AttendanceController::class);
@@ -41,7 +45,6 @@ Route::get('/attendance-summary', AttendanceSummaryController::class)
         Route::get('/attendance/self', [AttendanceSelfController::class, 'index'])->name('attendance.self');
         Route::post('/attendances/self', [AttendanceSelfController::class, 'store'])->name('attendances.store');
     });
-
 
 });
 

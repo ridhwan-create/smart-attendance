@@ -1,9 +1,12 @@
 import React from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Location } from '@/types';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Plus } from 'lucide-react';
+import Pagination from '@/components/ui/pagination';
+import type { BreadcrumbItem, Location } from '@/types';
+import type { PaginatedData } from '@/types/pagination';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -11,15 +14,32 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 type PageProps = {
-    locations: Location[];
+    locations: PaginatedData<Location>;
+    filters: {
+        search: string;
+    };
 };
 
-export default function LocationIndex({ locations }: PageProps) {
+export default function LocationIndex({ locations, filters }: PageProps) {
+    const { data, setData, get } = useForm({
+        search: filters.search || '',
+    });
+
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        get(route('locations.index'), {
+            preserveState: true,
+            preserveScroll: true,
+            only: ['locations'],
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Locations" />
-            <div className="p-4">
-                <div className="flex items-center justify-between mb-6">
+            <div className="p-4 space-y-4">
+                <div className="flex items-center justify-between">
                     <h1 className="text-xl font-semibold">Locations</h1>
                     <Button asChild variant="success" className="rounded p-3">
                         <Link href={route('locations.create')}>
@@ -29,10 +49,22 @@ export default function LocationIndex({ locations }: PageProps) {
                     </Button>
                 </div>
 
+                <form onSubmit={handleSearch} className="flex items-center gap-2">
+                    <Input
+                        name="search"
+                        value={data.search}
+                        onChange={(e) => setData('search', e.target.value)}
+                        placeholder="Search location name..."
+                        className="max-w-sm"
+                    />
+                    <Button type="submit">Search</Button>
+                </form>
+
                 <div className="overflow-x-auto">
                     <table className="min-w-full border rounded-md">
-                    <thead>
+                        <thead>
                             <tr className="text-left text-sm bg-muted">
+                                <th className="p-3">#</th>
                                 <th className="p-3">Name</th>
                                 <th className="p-3">Address</th>
                                 <th className="p-3">Latitude</th>
@@ -42,15 +74,16 @@ export default function LocationIndex({ locations }: PageProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {locations.length === 0 ? (
+                            {locations.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="p-4 text-center text-gray-500">
+                                    <td colSpan={7} className="p-4 text-center text-gray-500">
                                         No locations found.
                                     </td>
                                 </tr>
                             ) : (
-                                locations.map((location) => (
+                                locations.data.map((location, index) => (
                                     <tr key={location.id} className="border-t text-sm">
+                                        <td className="p-3">{(locations.from ?? 0) + index}</td>
                                         <td className="p-3">{location.name}</td>
                                         <td className="p-3">{location.address}</td>
                                         <td className="p-3">{location.latitude}</td>
@@ -76,6 +109,8 @@ export default function LocationIndex({ locations }: PageProps) {
                         </tbody>
                     </table>
                 </div>
+
+                <Pagination links={locations.links} />
             </div>
         </AppLayout>
     );

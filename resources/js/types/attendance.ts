@@ -11,6 +11,12 @@ export type Attendance = {
     name: string;
     check_in_time: string;
     check_out_time: string;
+    is_late?: boolean;
+    late_duration?: number;
+    is_early_leave?: boolean;
+    early_leave_duration?: number;
+    latitude?: number;
+    longitude?: number;
     location_id: number;
     notes: string;
     company_id: number;
@@ -25,3 +31,4 @@ export type Attendance = {
     created_by?: string;
     updated_by?: string;
 };
+
