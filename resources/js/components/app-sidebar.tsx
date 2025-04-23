@@ -14,6 +14,7 @@ import {
     CalendarCheck,
     Clock,
     FileClock,
+    DoorClosed,
     Settings,
   } from 'lucide-react';
 
@@ -27,6 +28,11 @@ const mainNavItems: NavItem[] = [
         title: 'Companies',
         href: '/companies',
         icon: Building2,
+      },
+      {
+        title: 'Departments',
+        href: '/departments',
+        icon: DoorClosed,
       },
       {
         title: 'Locations',

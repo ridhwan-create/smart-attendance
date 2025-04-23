@@ -109,7 +109,7 @@ export default function EmployeeIndex({ employees, filters }: PageProps) {
                                         <td className="p-3">{employee.company?.company_name ?? '-'}</td>
                                         <td className="p-3">{employee.department?.name ?? '-'}</td>
                                         <td className="p-3">{employee.position}</td>
-                                        <td className="p-3 text-right space-x-2 grid grid-cols-3 gap-2 justify-items-end">
+                                        <td className="p-3 space-x-2 flex gap-2">
                                             <Link
                                                 href={route('employees.show', employee.id)}
                                                 className="text-indigo-600 hover:underline"

@@ -10,14 +10,34 @@ use Inertia\Response;
 
 class DepartmentController extends Controller
 {
-    public function index(): Response
+    // public function index(): Response
+    // {
+    //     $departments = Department::with('company')->get();
+
+    //     return Inertia::render('departments/index', [
+    //         'departments' => $departments,
+    //     ]);
+    // }
+    public function index(Request $request): \Inertia\Response
     {
-        $departments = Department::with('company')->get();
+        $search = $request->input('search');
+
+        $departments = Department::with('company')
+            ->when($search, fn ($query) =>
+                $query->where('name', 'like', '%' . $search . '%')
+            )
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('departments/index', [
             'departments' => $departments,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
+
 
     public function create(): Response
     {

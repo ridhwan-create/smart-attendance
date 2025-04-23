@@ -3,10 +3,10 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus } from 'lucide-react';
 import Pagination from '@/components/ui/pagination';
 import type { BreadcrumbItem, Location } from '@/types';
 import type { PaginatedData } from '@/types/pagination';
+import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -89,18 +89,18 @@ export default function LocationIndex({ locations, filters }: PageProps) {
                                         <td className="p-3">{location.latitude}</td>
                                         <td className="p-3">{location.longitude}</td>
                                         <td className="p-3">{location.radius_meters}</td>
-                                        <td className="p-3 space-x-2">
+                                        <td className="p-3 space-x-2 flex gap-2">
                                             <Link
                                                 href={route('locations.show', location.id)}
                                                 className="text-indigo-600 hover:underline"
                                             >
-                                                View
+                                                <Eye className="w-4 h-4" />
                                             </Link>
                                             <Link
                                                 href={route('locations.edit', location.id)}
                                                 className="text-yellow-600 hover:underline"
                                             >
-                                                Edit
+                                                <Pencil className="w-4 h-4" />
                                             </Link>
                                         </td>
                                     </tr>

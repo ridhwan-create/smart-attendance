@@ -17,12 +17,29 @@ class CompanyController extends Controller
     //     ]);
     // }
 
-    public function index()
+    // public function index()
+    // {
+    //     $companies = Company::all();
+
+    //     return Inertia::render('companies/index', [
+    //         'companies' => $companies,
+    //     ]);
+    // }
+    public function index(Request $request)
     {
-        $companies = Company::all();
+        $search = $request->input('search');
+
+        $companies = Company::query()
+            ->when($search, fn($query) => $query->where('company_name', 'like', "%{$search}%"))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('companies/index', [
             'companies' => $companies,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

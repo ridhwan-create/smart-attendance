@@ -114,21 +114,21 @@ export default function AttendanceSummary({ summary }: Props) {
                 bgColor="bg-purple-100 dark:bg-purple-900/50"
                 iconColor="text-purple-600 dark:text-purple-300"
               />
-              <div className="mt-6 h-64">
-  <ResponsiveContainer width="100%" height="100%">
-    <BarChart data={[
-      { name: 'Attendance', value: company.today_attendance_count },
-      { name: 'Late', value: company.late },
-      { name: 'Early Leave', value: company.early_leave },
-    ]}>
-      <XAxis dataKey="name" />
-      <YAxis />
-      <Tooltip />
-      <Legend />
-      <Bar dataKey="value" fill="#6366F1" />
-    </BarChart>
-  </ResponsiveContainer>
-</div>
+              {/* <div className="mt-6 h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={[
+                    { name: 'Attendance', value: company.today_attendance_count },
+                    { name: 'Late', value: company.late },
+                    { name: 'Early Leave', value: company.early_leave },
+                  ]}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="value" fill="#6366F1" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div> */}
 
             </div>
 
