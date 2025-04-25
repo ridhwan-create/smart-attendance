@@ -12,6 +12,7 @@ use App\Http\Controllers\AttendanceRegisterController;
 use App\Http\Controllers\AttendanceSelfController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AttendanceSummaryController;
+use App\Http\Controllers\AttendanceReportController;
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
@@ -45,6 +46,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/attendance/self', [AttendanceSelfController::class, 'index'])->name('attendance.self');
         Route::post('/attendances/self', [AttendanceSelfController::class, 'store'])->name('attendances.store');
     });
+
+    Route::get('/attendance/report', [AttendanceReportController::class, 'index'])
+    ->name('attendances.report');
+    Route::get('/attendance/report/export', [AttendanceReportController::class, 'export'])->name('attendances.report.export');
+
 
 });
 

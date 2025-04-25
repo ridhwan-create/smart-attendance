@@ -12,6 +12,7 @@ import {
     MapPinCheck,
     Users,
     CalendarCheck,
+    CalendarCheck2,
     Clock,
     FileClock,
     DoorClosed,
@@ -50,11 +51,6 @@ const mainNavItems: NavItem[] = [
         icon: Users,
       },
       {
-        title: 'Attendances',
-        href: '/attendances',
-        icon: CalendarCheck,
-      },
-      {
         title: 'Working Hours',
         href: '/working-hours',
         icon: Clock,
@@ -63,6 +59,16 @@ const mainNavItems: NavItem[] = [
         title: 'Work Schedule Types',
         href: '/work-schedule-types',
         icon: FileClock,
+      },
+      {
+        title: 'Attendances',
+        href: '/attendances',
+        icon: CalendarCheck,
+      },
+      {
+        title: 'Attendances Report',
+        href: '/attendance/report',
+        icon: CalendarCheck2,
       },
 ];
 
