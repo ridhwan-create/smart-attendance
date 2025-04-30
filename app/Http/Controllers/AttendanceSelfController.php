@@ -73,16 +73,30 @@ class AttendanceSelfController extends Controller
             return back()->withErrors(['working_hour' => 'Invalid working hour format.']);
         }
 
-        $todayAttendance = Attendance::whereDate('created_at', $today)
-            ->where('employee_id', $employee->id)
-            ->first();
+        $todayAttendance = Attendance::firstOrNew(
+            [
+                'employee_id' => $employee->id,
+                'date_of_month' => $today,
+            ],
+            [
+                'ic_number' => $employee->ic_number,
+                'name' => $employee->name,
+                'company_id' => $employee->company_id ?? auth()->user()->company_id ?? null,
+                'created_by' => auth()->id(),
+            ]
+        );
+
+        $todayAttendance->fill([
+            'location_id' => $location->id,
+            'work_schedule_type_id' => $location->work_schedule_type_id,
+        ]);
 
         $isFlexible = $location->work_schedule_type?->type === 'Flexibel';
         $flexStart = Carbon::createFromTime(7, 30);
         $flexEnd = Carbon::createFromTime(9, 0);
 
         if ($request->type === 'check_in') {
-            if ($todayAttendance && $todayAttendance->check_in_time) {
+            if ($todayAttendance->check_in_time) {
                 return back()->withErrors(['type' => 'You have already checked in today.']);
             }
 
@@ -94,18 +108,10 @@ class AttendanceSelfController extends Controller
                 return back()->withErrors(['check_in_time' => 'Check-in time is outside allowed working hours.']);
             }
 
-            if (!$todayAttendance) {
-                $todayAttendance = new Attendance();
-                $todayAttendance->employee_id = $employee->id;
-                $todayAttendance->ic_number = $employee->ic_number;
-                $todayAttendance->name = $employee->name;
-                $todayAttendance->location_id = $location->id;
-                $todayAttendance->company_id = $employee->company_id ?? auth()->user()->company_id ?? null;
-                $todayAttendance->work_schedule_type_id = $location->work_schedule_type_id;
-                $todayAttendance->created_by = auth()->id();
-            }
-
             $todayAttendance->check_in_time = $now;
+            if (Carbon::parse($todayAttendance->date_of_month)->isSameDay($today)) {
+                $todayAttendance->status = 'present';
+            }            
 
             if ($isFlexible && $now->gt($flexEnd)) {
                 $todayAttendance->is_late = true;
@@ -120,7 +126,7 @@ class AttendanceSelfController extends Controller
         }
 
         if ($request->type === 'check_out') {
-            if (!$todayAttendance) {
+            if (!$todayAttendance->check_in_time) {
                 return back()->withErrors(['type' => 'You need to check in first before checking out.']);
             }
 

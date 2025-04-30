@@ -8,6 +8,7 @@ import { Pencil, Trash2, Plus } from 'lucide-react';
 import ConfirmDelete from '@/components/confirm-delete';
 import Pagination from '@/components/ui/pagination';
 import type { PaginatedData } from '@/types/pagination';
+import dayjs from 'dayjs';
 
 interface Props {
   attendances: PaginatedData<Attendance>;
@@ -83,11 +84,16 @@ export default function AttendanceIndex({ attendances, filters }: Props) {
                 <th className="p-3">#</th>
                 <th className="p-3">Employee</th>
                 <th className="p-3">IC Number</th>
+                <th className="p-3">Date</th>
+                <th className="p-3">Day</th>
                 <th className="p-3">Check-In</th>
                 <th className="p-3">Check-Out</th>
                 <th className="p-3">Location</th>
                 <th className="p-3">Company</th>
                 <th className="p-3">Schedule</th>
+                <th className="p-3">Late</th>
+                <th className="p-3">Early Leave</th>
+                <th className="p-3">Status</th>
                 <th className="p-3">Notes</th>
                 <th className="p-3 text-center">Actions</th>
               </tr>
@@ -105,11 +111,24 @@ export default function AttendanceIndex({ attendances, filters }: Props) {
                     <td className="p-3">{(attendances.from ?? 0) + index}</td>
                     <td className="p-3">{item.employee?.name ?? '-'}</td>
                     <td className="p-3">{item.employee?.ic_number ?? '-'}</td>
+                    <td className="p-3">{item.date_of_month ?? '-'}</td>
+                    <td className="p-3">{item.date_of_month ? dayjs(item.date_of_month).format('dddd') : '-'}</td>
                     <td className="p-3">{item.check_in_time ?? '-'}</td>
                     <td className="p-3">{item.check_out_time ?? '-'}</td>
                     <td className="p-3">{item.location?.name ?? '-'}</td>
                     <td className="p-3">{item.company?.company_name ?? '-'}</td>
                     <td className="p-3">{item.work_schedule_type?.type ?? '-'}</td>
+                    <td className="p-3">{item.is_late ? `${item.late_duration} min` : '-'}</td>
+                    <td className="p-3">{item.is_early_leave ? `${item.early_leave_duration} min` : '-'}</td>
+                    <td className="p-3">
+                                        {item.status ? (
+                                          <span className={item.status === 'present' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
+                                            {item.status}
+                                          </span>
+                                        ) : (
+                                          '-'
+                                        )}
+                    </td>
                     <td className="p-3">{item.notes ?? '-'}</td>
                     <td className="p-3 text-right space-x-2 grid grid-cols-2 gap-2 justify-items-end">
                       <Link

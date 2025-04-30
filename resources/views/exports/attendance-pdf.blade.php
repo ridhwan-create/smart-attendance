@@ -6,6 +6,9 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; }
         th { background: #f0f0f0; }
+        .weekend-row { background-color: #f5f5f5; }
+        .absent { color: red; font-weight: bold; }
+        .present { color: green; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -39,31 +42,76 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Check In</th>
-                <th>Check Out</th>
-                <th>Late</th>
-                <th>Early Leave</th>
+                <th className="p-3">Date</th>
+                <th className="p-3">Day</th>
+                <th className="p-3">Check-In</th>
+                <th className="p-3">Check-Out</th>
+                <th className="p-3">Late</th>
+                <th className="p-3">Early Leave</th>
+                <th className="p-3">Status</th>
                 <th>Remarks</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($attendances as $i => $a)
-                <tr>
+                @php
+                    $dayOfWeek = \Carbon\Carbon::parse($a->date_of_month)->format('l');
+                    $isWeekend = in_array($dayOfWeek, ['Saturday', 'Sunday']);
+                    $hasActivity = $a->check_in_time || $a->check_out_time;
+                    $statusClass = '';
+                    if (!$isWeekend || $hasActivity) {
+                        $statusClass = strtolower($a->status) === 'present' ? 'present' : 'absent';
+                    }
+                @endphp
+                <tr @if($isWeekend) class="weekend-row" @endif>
                     <td>{{ $i + 1 }}</td>
-                    <td @if($a->is_late) style="color: red;" @endif>
-                        {{ \Carbon\Carbon::parse($a->check_in_time)->format('d/m/Y H:i') }}
-                    </td>
-                    <td @if($a->is_early_leave) style="color: orange;" @endif>
-                        {{ \Carbon\Carbon::parse($a->check_out_time)->format('d/m/Y H:i') }}
+                    <td>
+                        {{ \Carbon\Carbon::parse($a->date_of_month)->format('d/m/Y') }}
                     </td>
                     <td>
-                        {{ $a->is_late ? $a->late_duration . ' min' : '-' }}
+                        {{ $dayOfWeek }}
+                    </td>
+                    <td @if($a->is_late && (!$isWeekend || $hasActivity)) style="color: red;" @endif>
+                        @if($isWeekend && !$hasActivity)
+                            -
+                        @else
+                            {{ optional($a->check_in_time, function($time) { return \Carbon\Carbon::parse($time)->format('H:i'); }) ?? '-' }}
+                        @endif
+                    </td>
+                    <td @if($a->is_early_leave && (!$isWeekend || $hasActivity)) style="color: orange;" @endif>
+                        @if($isWeekend && !$hasActivity)
+                            -
+                        @else
+                            {{ optional($a->check_out_time, function($time) { return \Carbon\Carbon::parse($time)->format('H:i'); }) ?? '-' }}
+                        @endif
                     </td>
                     <td>
-                        {{ $a->is_early_leave ? $a->early_leave_duration . ' min' : '-' }}
+                        @if($isWeekend && !$hasActivity)
+                            -
+                        @else
+                            {{ $a->is_late ? $a->late_duration . ' min ' : '- ' }}
+                        @endif
                     </td>
                     <td>
-                        {{ $a->notes ? $a->notes : '-' }}
+                        @if($isWeekend && !$hasActivity)
+                            -
+                        @else
+                            {{ $a->is_early_leave ? $a->early_leave_duration . ' min ' : '- ' }}
+                        @endif
+                    </td>
+                    <td class="{{ $statusClass }}">
+                        @if($isWeekend && !$hasActivity)
+                            -
+                        @else
+                            {{ $a->status }}
+                        @endif
+                    </td>
+                    <td>
+                        @if($isWeekend && !$hasActivity)
+                            -
+                        @else
+                            {{ $a->notes ? $a->notes : '-' }}
+                        @endif
                     </td>
                 </tr>
             @endforeach

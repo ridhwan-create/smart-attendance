@@ -29,6 +29,7 @@ class Attendance extends Model
         'employee_id',
         'ic_number',
         'name',
+        'date_of_month',
         'check_in_time',
         'is_late',
         'late_duration',
@@ -43,6 +44,7 @@ class Attendance extends Model
         'updated_by',
         'latitude',
         'longitude',
+        'status'
     ];    
 
     protected $dates = ['check_in_time', 'check_out_time'];

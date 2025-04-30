@@ -1,23 +1,47 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import { Button } from './button';
 
-type PaginationLink = {
-    url: string | null;
-    label: string;
-    active: boolean;
+interface PaginationLink {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+interface Props {
+  links: PaginationLink[];
+  onNavigate?: () => void; // optional: callback untuk trigger setIsSubmitted(true)
+}
+
+const Pagination: React.FC<Props> = ({ links, onNavigate }) => {
+  const { data, get } = useForm();
+
+  const handleClick = (url: string | null) => {
+    if (!url) return;
+
+    get(url, {
+      preserveScroll: true,
+      preserveState: true,
+      only: ['attendances'],
+      onSuccess: () => {
+        onNavigate?.(); // trigger semula isSubmitted
+      },
+    });
+  };
+
+  return (
+    <div className="flex gap-2 flex-wrap mt-4">
+      {links.map((link, index) => (
+        <Button
+          key={index}
+          variant={link.active ? 'default' : 'outline'}
+          disabled={!link.url}
+          onClick={() => handleClick(link.url)}
+          dangerouslySetInnerHTML={{ __html: link.label }}
+        />
+      ))}
+    </div>
+  );
 };
 
-export default function Pagination({ links }: { links: PaginationLink[] }) {
-    return (
-        <div className="flex justify-center mt-4 gap-1 flex-wrap">
-            {links.map((link, i) => (
-                <Link
-                    key={i}
-                    href={link.url ?? ''}
-                    className={`px-3 py-1 border text-sm rounded ${link.active ? 'bg-primary text-white' : 'hover:bg-muted'} ${!link.url ? 'pointer-events-none text-gray-400' : ''}`}
-                    dangerouslySetInnerHTML={{ __html: link.label }}
-                />
-            ))}
-        </div>
-    );
-}
+export default Pagination;

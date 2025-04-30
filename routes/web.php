@@ -51,6 +51,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->name('attendances.report');
     Route::get('/attendance/report/export', [AttendanceReportController::class, 'export'])->name('attendances.report.export');
 
+    // Route::get('/attendance/generate', function () {
+    //     return view('attendance.generate');
+    // })->name('attendance.generate.view');
+
+    // Route::post('/attendance/generate', [AttendanceController::class, 'generateMonthlyAttendance'])->name('attendance.generate');
+
+    Route::get('/attendance/generate', function () {
+        return Inertia::render('attendances/generate');
+    })->name('attendance.generate.view');
+
+    Route::post('/attendance/generate', [AttendanceController::class, 'generateMonthlyAttendance'])
+    ->name('attendance.generate');
 
 });
 

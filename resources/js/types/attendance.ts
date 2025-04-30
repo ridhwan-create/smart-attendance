@@ -9,6 +9,7 @@ export type Attendance = {
     employee_id: number;
     ic_number: string;
     name: string;
+    date_of_month: string;
     check_in_time: string;
     check_out_time: string;
     is_late?: boolean;
@@ -18,6 +19,7 @@ export type Attendance = {
     latitude?: number;
     longitude?: number;
     location_id: number;
+    status: string;
     notes: string;
     company_id: number;
     work_schedule_type_id: number;
