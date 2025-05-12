@@ -6,11 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
+use App\Models\Employee;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -48,7 +50,20 @@ class User extends Authenticatable
 
     public function employee()
     {
-        return $this->hasOne(Employee::class);
+        return $this->hasOne(Employee::class, 'user_id');
+    }
+
+    public function isEmployee()
+    {
+        // Sesuaikan dengan logika aplikasi Anda
+        // Contoh 1: Jika ada kolom role di tabel users
+        return $this->role === 'Employee';
+        
+        // Contoh 2: Jika menggunakan relasi ke tabel employees
+        // return !is_null($this->employee_id);
+        
+        // Contoh 3: Jika menggunakan spatie/laravel-permission
+        // return $this->hasRole('employee');
     }
 
 }

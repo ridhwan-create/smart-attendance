@@ -9,6 +9,8 @@ use Database\Seeders\LocationSeeder;
 use Database\Seeders\WorkScheduleTypeSeeder;
 use Database\Seeders\EmployeeSeeder;
 use Database\Seeders\AttendanceSeeder;
+use Database\Seeders\RoleAndPermissionSeeder;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -25,8 +27,6 @@ class DatabaseSeeder extends Seeder
     // }
     public function run(): void
     {
-        $this->call([
-            AttendanceSeeder::class,
-        ]);        
+        $this->call(RoleAndPermissionSeeder::class);     
     }
 }

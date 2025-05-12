@@ -4,11 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Request; // optional
-use Illuminate\Support\Facades\Auth; // jika anda nak guna Auth
-use Spatie\Permission\Models\Permission; // jika perlu guna di masa hadapan
-
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,17 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Inertia::share([
-        //     'auth' => function () {
-        //         $user = request()->user();
-
-        //         return [
-        //             'user' => $user,
-        //             'permissions' => $user ? $user->getAllPermissions()->pluck('name') : [],
-        //         ];
-        //     },
-        // ]);
-
         //
         // if (env('APP_ENV') === 'local') {
         //     URL::forceScheme('https');

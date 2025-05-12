@@ -39,38 +39,18 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        return array_merge(parent::share($request), [
+        return [
+            ...parent::share($request),
             'name' => config('app.name'),
-            'quote' => [
-                'message' => trim($message),
-                'author' => trim($author),
+            'quote' => ['message' => trim($message), 'author' => trim($author)],
+            'auth' => [
+                'user' => $request->user(),
             ],
-            'auth' => function () use ($request) {
-                $user = $request->user();
-                
-                if (!$user) {
-                    return [
-                        'user' => null,
-                        'permissions' => [],
-                    ];
-                }
-
-                return [
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'roles' => $user->getRoleNames(),
-                        'permissions' => $user->getAllPermissions()->pluck('name'),
-                    ],
-                    'permissions' => $user->getAllPermissions()->pluck('name'),
-                ];
-            },
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-        ]);
+        ];
     }
 }

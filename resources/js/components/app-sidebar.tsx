@@ -4,6 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 import {
@@ -16,61 +17,160 @@ import {
     Clock,
     FileClock,
     DoorClosed,
+    UserRoundPlus,
+    UserRoundCheck,
+    LayoutList,
     Settings,
   } from 'lucide-react';
 
-const mainNavItems: NavItem[] = [
+// const mainNavItems: NavItem[] = [
+//     {
+//       title: 'Employee Dashboard',
+//       href: '/employee/dashboard',
+//       icon: LayoutList,
+//     },
+//     {
+//         title: 'Dashboard',
+//         href: '/dashboard',
+//         icon: LayoutGrid,
+//     },
+//     {
+//         title: 'Companies',
+//         href: '/companies',
+//         icon: Building2,
+//       },
+//       {
+//         title: 'Departments',
+//         href: '/departments',
+//         icon: DoorClosed,
+//       },
+//       {
+//         title: 'Locations',
+//         href: '/locations',
+//         icon: MapPin,
+//       },
+//       {
+//         title: 'Locations Checker',
+//         href: '/location-check',
+//         icon: MapPinCheck,
+//       },
+//       {
+//         title: 'Employees',
+//         href: '/employees',
+//         icon: Users,
+//       },
+//       {
+//         title: 'Working Hours',
+//         href: '/working-hours',
+//         icon: Clock,
+//       },
+//       {
+//         title: 'Work Schedule Types',
+//         href: '/work-schedule-types',
+//         icon: FileClock,
+//       },
+//       {
+//         title: 'Attendances',
+//         href: '/attendances',
+//         icon: CalendarCheck,
+//       },
+//       {
+//         title: 'Attendances Report',
+//         href: '/attendance/report',
+//         icon: CalendarCheck2,
+//       },
+//       {
+//         title: 'Roles',
+//         href: '/roles',
+//         icon: UserRoundCheck,
+//       },
+//       {
+//         title: 'Users',
+//         href: '/users',
+//         icon: UserRoundPlus,
+//       },
+// ];
+  const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
+      title: 'Dashboard',
+      href: '/employee/dashboard',
+      icon: LayoutList,
+      permission: 'view self attendance',
     },
     {
-        title: 'Companies',
-        href: '/companies',
-        icon: Building2,
-      },
-      {
-        title: 'Departments',
-        href: '/departments',
-        icon: DoorClosed,
-      },
-      {
-        title: 'Locations',
-        href: '/locations',
-        icon: MapPin,
-      },
-      {
-        title: 'Locations Checker',
-        href: '/location-check',
-        icon: MapPinCheck,
-      },
-      {
-        title: 'Employees',
-        href: '/employees',
-        icon: Users,
-      },
-      {
-        title: 'Working Hours',
-        href: '/working-hours',
-        icon: Clock,
-      },
-      {
-        title: 'Work Schedule Types',
-        href: '/work-schedule-types',
-        icon: FileClock,
-      },
-      {
-        title: 'Attendances',
-        href: '/attendances',
-        icon: CalendarCheck,
-      },
-      {
-        title: 'Attendances Report',
-        href: '/attendance/report',
-        icon: CalendarCheck2,
-      },
-];
+      title: 'Dashboard',
+      href: '/dashboard',
+      icon: LayoutGrid,
+      permission: 'view dashboard super', // Optional if you have this
+    },
+    {
+      title: 'Companies',
+      href: '/companies',
+      icon: Building2,
+      permission: 'view companies',
+    },
+    {
+      title: 'Departments',
+      href: '/departments',
+      icon: DoorClosed,
+      permission: 'view departments',
+    },
+    {
+      title: 'Locations',
+      href: '/locations',
+      icon: MapPin,
+      permission: 'view locations',
+    },
+    {
+      title: 'Locations Checker',
+      href: '/location-check',
+      icon: MapPinCheck,
+      permission: 'view locations',
+    },
+    {
+      title: 'Employees',
+      href: '/employees',
+      icon: Users,
+      permission: 'view employees',
+    },
+    {
+      title: 'Working Hours',
+      href: '/working-hours',
+      icon: Clock,
+      permission: 'view working hours',
+    },
+    {
+      title: 'Work Schedule Types',
+      href: '/work-schedule-types',
+      icon: FileClock,
+      permission: 'view work schedule types',
+    },
+    {
+      title: 'Attendances',
+      href: '/attendances',
+      icon: CalendarCheck,
+      permission: 'view attendances',
+    },
+    {
+      title: 'Attendances Report',
+      href: '/attendance/report',
+      icon: CalendarCheck2,
+      permission: 'view attendance reports',
+    },
+    {
+      title: 'Roles',
+      href: '/roles',
+      icon: UserRoundCheck,
+      permission: 'view roles',
+    },
+    {
+      title: 'Users',
+      href: '/users',
+      icon: UserRoundPlus,
+      permission: 'view users',
+    },
+  ];
+
 
 const footerNavItems: NavItem[] = [
     // {
@@ -85,29 +185,73 @@ const footerNavItems: NavItem[] = [
     // },
 ];
 
+// export function AppSidebar() {
+
+
 export function AppSidebar() {
-    return (
-        <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
-                                <AppLogo />
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
+  const { props } = usePage<{
+    auth?: {
+      user: {
+        permissions: string[];
+      };
+    };
+  }>();
 
-            <SidebarContent>
-                <NavMain items={mainNavItems} />
-            </SidebarContent>
+  const permissions = props.auth?.user?.permissions ?? [];
 
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
-            </SidebarFooter>
-        </Sidebar>
+
+  const filteredNavItems: NavItem[] = mainNavItems.filter(
+    item => !item.permission || permissions.includes(item.permission)
+  );
+
+
+    // return (
+    //     <Sidebar collapsible="icon" variant="inset">
+    //         <SidebarHeader>
+    //             <SidebarMenu>
+    //                 <SidebarMenuItem>
+    //                     <SidebarMenuButton size="lg" asChild>
+    //                         <Link href="/dashboard" prefetch>
+    //                             <AppLogo />
+    //                         </Link>
+    //                     </SidebarMenuButton>
+    //                 </SidebarMenuItem>
+    //             </SidebarMenu>
+    //         </SidebarHeader>
+
+    //         <SidebarContent>
+    //             <NavMain items={mainNavItems} />
+    //         </SidebarContent>
+
+    //         <SidebarFooter>
+    //             <NavFooter items={footerNavItems} className="mt-auto" />
+    //             <NavUser />
+    //         </SidebarFooter>
+    //     </Sidebar>
+    // );
+  return (
+      <Sidebar collapsible="icon" variant="inset">
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg" asChild>
+                <Link href="/dashboard" prefetch>
+                  <AppLogo />
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+
+        <SidebarContent>
+          <NavMain items={filteredNavItems} />
+        </SidebarContent>
+
+        <SidebarFooter>
+          <NavFooter items={footerNavItems} className="mt-auto" />
+          <NavUser />
+        </SidebarFooter>
+      </Sidebar>
     );
+  
 }

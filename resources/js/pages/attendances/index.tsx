@@ -9,6 +9,7 @@ import ConfirmDelete from '@/components/confirm-delete';
 import Pagination from '@/components/ui/pagination';
 import type { PaginatedData } from '@/types/pagination';
 import dayjs from 'dayjs';
+import { usePage } from '@inertiajs/react';
 
 interface Props {
   attendances: PaginatedData<Attendance>;
@@ -22,6 +23,13 @@ export default function AttendanceIndex({ attendances, filters }: Props) {
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Attendances', href: '/attendances' },
   ];
+
+  const { auth } = usePage().props as any;
+  const userPermissions: string[] = auth?.permissions ?? [];
+
+  const canCreate = userPermissions.includes('create attendances');
+  const canEdit = userPermissions.includes('edit attendances');
+  const canDelete = userPermissions.includes('delete attendances');
 
   const { data, setData, get } = useForm({
     search: filters.search || '',
@@ -58,12 +66,14 @@ export default function AttendanceIndex({ attendances, filters }: Props) {
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">Attendances</h1>
-          <Button asChild variant="success" className="rounded p-3">
-            <Link href={route('attendances.create')}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Attendance
-            </Link>
-          </Button>
+          {canCreate && (
+            <Button asChild variant="success" className="rounded p-3">
+              <Link href={route('attendances.create')}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Attendance
+              </Link>
+            </Button>
+          )}
         </div>
 
         <form onSubmit={handleSearch} className="flex items-center gap-2">
@@ -101,7 +111,7 @@ export default function AttendanceIndex({ attendances, filters }: Props) {
             <tbody>
               {attendances.data.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="p-4 text-center text-gray-500">
+                  <td colSpan={15} className="p-4 text-center text-gray-500">
                     No attendance records found.
                   </td>
                 </tr>
@@ -121,28 +131,32 @@ export default function AttendanceIndex({ attendances, filters }: Props) {
                     <td className="p-3">{item.is_late ? `${item.late_duration} min` : '-'}</td>
                     <td className="p-3">{item.is_early_leave ? `${item.early_leave_duration} min` : '-'}</td>
                     <td className="p-3">
-                                        {item.status ? (
-                                          <span className={item.status === 'present' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
-                                            {item.status}
-                                          </span>
-                                        ) : (
-                                          '-'
-                                        )}
+                      {item.status ? (
+                        <span className={item.status === 'present' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
+                          {item.status}
+                        </span>
+                      ) : (
+                        '-'
+                      )}
                     </td>
                     <td className="p-3">{item.notes ?? '-'}</td>
                     <td className="p-3 text-right space-x-2 grid grid-cols-2 gap-2 justify-items-end">
-                      <Link
-                        href={route('attendances.edit', item.id)}
-                        className="text-yellow-600 hover:underline"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Link>
-                      <button
-                        onClick={() => handleDeleteClick(item.id)}
-                        className="text-red-600 hover:underline"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {canEdit && (
+                        <Link
+                          href={route('attendances.edit', item.id)}
+                          className="text-yellow-600 hover:underline"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Link>
+                      )}
+                      {canDelete && (
+                        <button
+                          onClick={() => handleDeleteClick(item.id)}
+                          className="text-red-600 hover:underline"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

@@ -2,24 +2,27 @@ import React from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useForm } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, Attendance } from '@/types';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
 import { LoaderCircle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Pagination from '@/components/ui/pagination';
+import type { PaginatedData } from '@/types/pagination';
 import { FileText, FileSpreadsheet } from 'lucide-react';
 import { useState } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, Plus } from 'lucide-react';
 import ConfirmDelete from '@/components/confirm-delete';
 
 export default function AttendanceReport() {
     const { props } = usePage();
-    const { auth, attendances, filters, companies, processing, errors, isEmployee } = props as any;
+    const { auth, attendances, filters, companies, processing, errors } = props as any;
     
+    const isEmployee = auth?.user?.is_employee;
     const userPermissions: string[] = auth?.permissions ?? [];
     const canEdit = userPermissions.includes('edit attendances');
     const canDelete = userPermissions.includes('delete attendances');
@@ -71,30 +74,14 @@ export default function AttendanceReport() {
         );
     };
 
-    // const handleExport = (format: 'pdf' | 'excel') => {
-    //     if (!data.start_date || !data.end_date || (!isEmployee && !data.company_id)) {
-    //         alert(`Please fill in the start date, end date${!isEmployee ? ' and company' : ''} before exporting.`);
-    //         return;
-    //     }
-
-    //     const query = new URLSearchParams(data as any).toString();
-    //     window.open(`/attendance/report/export?format=${format}&${query}`, '_blank');
-    // };
-
     const handleExport = (format: 'pdf' | 'excel') => {
         if (!data.start_date || !data.end_date || (!isEmployee && !data.company_id)) {
             alert(`Please fill in the start date, end date${!isEmployee ? ' and company' : ''} before exporting.`);
             return;
         }
 
-        const exportData = {
-            ...data,
-            // Untuk employee, tambahkan user_id dari auth
-            ...(isEmployee && { user_id: auth.user.id }),
-            format
-        };
-
-        window.open(`/attendance/report/export?${new URLSearchParams(exportData).toString()}`, '_blank');
+        const query = new URLSearchParams(data as any).toString();
+        window.open(`/attendance/report/export?format=${format}&${query}`, '_blank');
     };
 
     const submit = () => {
@@ -136,7 +123,7 @@ export default function AttendanceReport() {
                 </h1>
 
                 <div className="space-y-4">
-                    <div className={`grid grid-cols-1 ${isEmployee ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-4'} gap-4`}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="space-y-1">
                             <Label>Start Date</Label>
                             <Input 
@@ -158,39 +145,37 @@ export default function AttendanceReport() {
                         </div>
 
                         {!isEmployee && (
-                            <>
-                                <div className="space-y-1">
-                                    <Label>Company</Label>
-                                    <Select 
-                                        value={data.company_id} 
-                                        onValueChange={value => setData('company_id', value)}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="All companies" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {companies.map((company: any) => (
-                                                <SelectItem key={company.id} value={company.id}>
-                                                    {company.company_name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.company_id} />
-                                </div>
-
-                                <div className="space-y-1 sm:col-span-2 lg:col-span-1">
-                                    <Label>Search</Label>
-                                    <Input
-                                        name="search"
-                                        value={data.search}
-                                        onChange={(e) => setData('search', e.target.value)}
-                                        placeholder="Search employee name, IC, location..."
-                                    />
-                                    <InputError message={errors.search} />
-                                </div>
-                            </>
+                            <div className="space-y-1">
+                                <Label>Company</Label>
+                                <Select 
+                                    value={data.company_id} 
+                                    onValueChange={value => setData('company_id', value)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="All companies" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {companies.map((company: any) => (
+                                            <SelectItem key={company.id} value={company.id}>
+                                                {company.company_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.company_id} />
+                            </div>
                         )}
+
+                        <div className="space-y-1 sm:col-span-2 lg:col-span-1">
+                            <Label>Search</Label>
+                            <Input
+                                name="search"
+                                value={data.search}
+                                onChange={(e) => setData('search', e.target.value)}
+                                placeholder="Search employee name, IC, location..."
+                            />
+                            <InputError message={errors.search} />
+                        </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
@@ -216,8 +201,8 @@ export default function AttendanceReport() {
                                 <tr className="text-left bg-muted">
                                     <th className="p-3">#</th>
                                     {!isEmployee && <th className="py-2">Company</th>}
-                                    {!isEmployee && <th className="py-2">Name</th>}
-                                    {!isEmployee && <th className="py-2">IC</th>}
+                                    <th className="py-2">Name</th>
+                                    <th className="py-2">IC</th>
                                     <th className="p-3">Date</th>
                                     <th className="p-3">Day</th>
                                     <th className="p-3">Check-In</th>
@@ -226,9 +211,7 @@ export default function AttendanceReport() {
                                     <th className="p-3">Late</th>
                                     <th className="p-3">Early Leave</th>
                                     <th className="p-3">Status</th>
-                                    {(canEdit || canDelete) && (
-                                        <th className="p-3 text-center">Actions</th>
-                                    )}
+                                    <th className="p-3 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -238,16 +221,12 @@ export default function AttendanceReport() {
                                         {!isEmployee && (
                                             <td className="py-2">{row.employee?.company?.company_name ?? '-'}</td>
                                         )}
-                                        {!isEmployee && (
-                                            <td className="py-2">{row.employee?.name ?? '-'}</td>
-                                        )}
-                                        {!isEmployee && (
-                                            <td className="py-2">{row.employee?.ic_number ?? '-'}</td>
-                                        )}
+                                        <td className="py-2">{row.name}</td>
+                                        <td className="py-2">{row.ic_number}</td>
                                         <td className="py-2">{dayjs(row.date_of_month).format('DD/MM/YYYY')}</td>
                                         <td className="py-2">{dayjs(row.date_of_month).format('dddd')}</td>
-                                        <td className="py-2">{row.check_in_time ? dayjs(row.check_in_time).format('HH:mm') : '-'}</td>
-                                        <td className="py-2">{row.check_out_time ? dayjs(row.check_out_time).format('HH:mm') : '-'}</td>
+                                        <td className="py-2">{dayjs(row.check_in_time).format('HH:mm')}</td>
+                                        <td className="py-2">{dayjs(row.check_out_time).format('HH:mm')}</td>
                                         <td className="py-2">{row.location?.name ?? '-'}</td>
                                         <td className="py-2">{row.is_late ? `${row.late_duration} min` : '-'}</td>
                                         <td className="py-2">{row.is_early_leave ? `${row.early_leave_duration} min` : '-'}</td>
@@ -260,26 +239,24 @@ export default function AttendanceReport() {
                                                 '-'
                                             )}
                                         </td>
-                                        {(canEdit || canDelete) && (
-                                            <td className="p-3 text-right space-x-2 grid grid-cols-2 gap-2 justify-items-end">
-                                                {canEdit && (
-                                                    <Link
-                                                        href={route('attendances.edit', row.id)}
-                                                        className="text-yellow-600 hover:underline"
-                                                    >
-                                                        <Pencil className="w-4 h-4" />
-                                                    </Link>
-                                                )}
-                                                {canDelete && (
-                                                    <button
-                                                        onClick={() => handleDeleteClick(row.id)}
-                                                        className="text-red-600 hover:underline"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                            </td>
-                                        )}
+                                        <td className="p-3 text-right space-x-2 grid grid-cols-2 gap-2 justify-items-end">
+                                            {canEdit && (
+                                                <Link
+                                                    href={route('attendances.edit', row.id)}
+                                                    className="text-yellow-600 hover:underline"
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </Link>
+                                            )}
+                                            {canDelete && (
+                                                <button
+                                                    onClick={() => handleDeleteClick(row.id)}
+                                                    className="text-red-600 hover:underline"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

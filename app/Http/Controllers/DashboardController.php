@@ -30,6 +30,7 @@ use App\Models\Company;
 use App\Models\Location;
 use App\Models\Employee;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -155,4 +156,74 @@ class DashboardController extends Controller
         ]);
         
     }
+    
+    // public function employeeDashboard()
+    // {
+    //     $user = Auth::user();
+    
+    //     // Pastikan eager loading untuk elak N+1 query
+    //     $employee = $user->employee()->with('location')->first();
+    
+    
+    //     $today = Carbon::today();
+    //     $attendance = Attendance::where('employee_id', optional($employee)->id)
+    //         ->whereDate('check_in_time', $today)
+    //         ->first();
+    
+    //     return Inertia::render('EmployeeDashboard', [
+    //         'employee' => [
+    //             'name' => $user->name,
+    //             'ic_number' => optional($employee)->ic_number ?? '-',
+    //             'location' => optional(optional($employee)->location)->name ?? '-',
+    //         ],
+    //         'attendance' => [
+    //             'status' => $attendance ? 'Present' : 'Absent',
+    //             'check_in_time' => $attendance && $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i'): '-',
+    //             'check_out_time' => optional($attendance)->check_out_time  ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i'): '-',
+    //             'is_late' => $attendance->is_late ,
+    //             'late_duration' => $attendance->late_duration ,
+    //             'is_early_leave' => $attendance->is_early_leave ,
+    //             'early_leave_duration' => $attendance->early_leave_duration ,
+    //         ],
+    //     ]);
+    // }
+    
+    public function employeeDashboard()
+    {
+        $user = Auth::user();
+        $today = Carbon::today();
+    
+        // Load employee with location and company
+        $employee = $user->employee()->with(['location', 'company'])->first();
+    
+        // Dapatkan rekod kehadiran untuk hari ini
+        $attendance = null;
+        if ($employee) {
+            $attendance = Attendance::where('employee_id', $employee->id)
+                ->whereDate('check_in_time', $today)
+                ->first();
+        }
+    
+        return Inertia::render('EmployeeDashboard', [
+            'employee' => [
+                'name' => $user->name,
+                'ic_number' => $employee->ic_number ?? '-',
+                'location' => $employee->location->name ?? '-',
+                'company' => $employee->company->company_name ?? '-',
+            ],
+            'attendance' => [
+                'status' => $attendance ? 'Present' : 'Absent',
+                'check_in_time' => $attendance && $attendance->check_in_time
+                    ? Carbon::parse($attendance->check_in_time)->format('H:i') : '-',
+                'check_out_time' => $attendance && $attendance->check_out_time
+                    ? Carbon::parse($attendance->check_out_time)->format('H:i') : '-',
+                'is_late' => $attendance->is_late ?? false,
+                'late_duration' => $attendance->late_duration ?? 0,
+                'is_early_leave' => $attendance->is_early_leave ?? false,
+                'early_leave_duration' => $attendance->early_leave_duration ?? 0,
+            ],
+        ]);
+    }
+    
+
 }

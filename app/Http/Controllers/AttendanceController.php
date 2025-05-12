@@ -18,6 +18,14 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view attendances')->only(['index', 'show']);
+        $this->middleware('permission:create attendances')->only(['create', 'store']);
+        $this->middleware('permission:edit attendances')->only(['edit', 'update']);
+        $this->middleware('permission:delete attendances')->only(['destroy']);
+    }
+
         // Fungsi ini dipanggil oleh scheduler pada 1hb setiap bulan
         // public function generateMonthlyAttendance()
         // {
