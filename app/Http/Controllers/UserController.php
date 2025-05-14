@@ -21,22 +21,53 @@ class UserController extends Controller
         $this->middleware('permission:assign roles')->only(['showAssignRoleForm', 'assignRole']);
     }
 
+    // public function index()
+    // {
+    //     $users = User::with('roles')
+    //         ->latest()
+    //         ->paginate(10)
+    //         ->through(function ($user) {
+    //             return [
+    //                 'id' => $user->id,
+    //                 'name' => $user->name,
+    //                 'email' => $user->email,
+    //                 'roles' => $user->roles->map(function ($role) {
+    //                     return [
+    //                         'id' => $role->id,
+    //                         'name' => $role->name,
+    //                     ];
+    //                 }),
+    //                 'created_at' => $user->created_at->format('d M Y'),
+    //             ];
+    //         });
+
+    //     return Inertia::render('users/index', [
+    //         'users' => $users,
+    //         'roles' => Role::pluck('name', 'id'),
+    //         'filters' => request()->only(['search']),
+    //     ]);
+    // }
     public function index()
     {
+        $perPage = request('perPage', 10); // default 10 jika tiada
+        $search = request('search');
+
         $users = User::with('roles')
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
             ->latest()
-            ->paginate(10)
+            ->paginate($perPage)
+            ->withQueryString()
             ->through(function ($user) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'roles' => $user->roles->map(function ($role) {
-                        return [
-                            'id' => $role->id,
-                            'name' => $role->name,
-                        ];
-                    }),
+                    'roles' => $user->roles->map(fn($role) => [
+                        'id' => $role->id,
+                        'name' => $role->name,
+                    ]),
                     'created_at' => $user->created_at->format('d M Y'),
                 ];
             });
@@ -44,9 +75,10 @@ class UserController extends Controller
         return Inertia::render('users/index', [
             'users' => $users,
             'roles' => Role::pluck('name', 'id'),
-            'filters' => request()->only(['search']),
+            'filters' => request()->only(['search', 'perPage']),
         ]);
     }
+
 
     public function create()
     {

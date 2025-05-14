@@ -8,20 +8,21 @@ import { usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 import {
-    Building2,
-    MapPin,
-    MapPinCheck,
-    Users,
-    CalendarCheck,
-    CalendarCheck2,
-    Clock,
-    FileClock,
-    DoorClosed,
-    UserRoundPlus,
-    UserRoundCheck,
-    LayoutList,
-    Settings,
-  } from 'lucide-react';
+  Building2,
+  MapPin,
+  MapPinCheck,
+  Users,
+  CalendarCheck,
+  CalendarCheck2,
+  Clock,
+  FileClock,
+  DoorClosed,
+  UserRoundPlus,
+  UserRoundCheck,
+  LayoutList,
+  LayoutPanelLeft,
+  Settings,
+} from 'lucide-react';
 
 // const mainNavItems: NavItem[] = [
 //     {
@@ -90,99 +91,117 @@ import {
 //         icon: UserRoundPlus,
 //       },
 // ];
-  const mainNavItems: NavItem[] = [
-    {
-      title: 'Dashboard',
-      href: '/employee/dashboard',
-      icon: LayoutList,
-      permission: 'view self attendance',
+const mainNavItems: NavItem[] = [
+  // {
+  //   title: 'Clock In / Out',
+  //   href: '/employee/dashboard',
+  //   icon: LayoutList,
+  //   permission: 'view self attendance',
+  // },
+  {
+    title: 'Clock In / Out',
+    href: '/employee/dashboard',
+    icon: Clock,
+    permission: 'view self attendance',
+    className: 'bg-red-600',
+    badge: {
+      text: 'ATTEND NOW',
+      color: 'bg-white text-primary-600'
     },
-    {
-      title: 'Dashboard',
-      href: '/dashboard',
-      icon: LayoutGrid,
-      permission: 'view dashboard super', // Optional if you have this
-    },
-    {
-      title: 'Companies',
-      href: '/companies',
-      icon: Building2,
-      permission: 'view companies',
-    },
-    {
-      title: 'Departments',
-      href: '/departments',
-      icon: DoorClosed,
-      permission: 'view departments',
-    },
-    {
-      title: 'Locations',
-      href: '/locations',
-      icon: MapPin,
-      permission: 'view locations',
-    },
-    {
-      title: 'Locations Checker',
-      href: '/location-check',
-      icon: MapPinCheck,
-      permission: 'view locations',
-    },
-    {
-      title: 'Employees',
-      href: '/employees',
-      icon: Users,
-      permission: 'view employees',
-    },
-    {
-      title: 'Working Hours',
-      href: '/working-hours',
-      icon: Clock,
-      permission: 'view working hours',
-    },
-    {
-      title: 'Work Schedule Types',
-      href: '/work-schedule-types',
-      icon: FileClock,
-      permission: 'view work schedule types',
-    },
-    {
-      title: 'Attendances',
-      href: '/attendances',
-      icon: CalendarCheck,
-      permission: 'view attendances',
-    },
-    {
-      title: 'Attendances Report',
-      href: '/attendance/report',
-      icon: CalendarCheck2,
-      permission: 'view attendance reports',
-    },
-    {
-      title: 'Roles',
-      href: '/roles',
-      icon: UserRoundCheck,
-      permission: 'view roles',
-    },
-    {
-      title: 'Users',
-      href: '/users',
-      icon: UserRoundPlus,
-      permission: 'view users',
-    },
-  ];
+    highlight: true,
+  },
+  {
+    title: 'Dashboard',
+    href: '/manager/dashboard',
+    icon: LayoutPanelLeft,
+    permission: 'view dashboard manager',
+  },
+  {
+    title: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutGrid,
+    permission: 'view dashboard super', // Optional if you have this
+  },
+  {
+    title: 'Companies',
+    href: '/companies',
+    icon: Building2,
+    permission: 'view companies',
+  },
+  {
+    title: 'Departments',
+    href: '/departments',
+    icon: DoorClosed,
+    permission: 'view departments',
+  },
+  {
+    title: 'Locations',
+    href: '/locations',
+    icon: MapPin,
+    permission: 'view locations',
+  },
+  {
+    title: 'Locations Checker',
+    href: '/location-check',
+    icon: MapPinCheck,
+    permission: 'view locations',
+  },
+  {
+    title: 'Employees',
+    href: '/employees',
+    icon: Users,
+    permission: 'view employees',
+  },
+  {
+    title: 'Working Hours',
+    href: '/working-hours',
+    icon: Clock,
+    permission: 'view working hours',
+  },
+  {
+    title: 'Work Schedule Types',
+    href: '/work-schedule-types',
+    icon: FileClock,
+    permission: 'view work schedule types',
+  },
+  {
+    title: 'Attendances',
+    href: '/attendances',
+    icon: CalendarCheck,
+    permission: 'view attendances',
+  },
+  {
+    title: 'Attendances Report',
+    href: '/attendance/report',
+    icon: CalendarCheck2,
+    permission: 'view attendance reports',
+  },
+  {
+    title: 'Roles',
+    href: '/roles',
+    icon: UserRoundCheck,
+    permission: 'view roles',
+  },
+  {
+    title: 'Users',
+    href: '/users',
+    icon: UserRoundPlus,
+    permission: 'view users',
+  },
+];
 
 
 const footerNavItems: NavItem[] = [
-    // {
-    //     title: 'Repository',
-    //     href: 'https://github.com/laravel/react-starter-kit',
-    //     icon: Folder,
-    // },
-    // {
-    //     title: 'Documentation',
-    //     href: 'https://laravel.com/docs/starter-kits',
-    //     icon: BookOpen,
-    // },
+  // {
+  //     title: 'Repository',
+  //     href: 'https://github.com/laravel/react-starter-kit',
+  //     icon: Folder,
+  // },
+  // {
+  //     title: 'Documentation',
+  //     href: 'https://laravel.com/docs/starter-kits',
+  //     icon: BookOpen,
+  // },
 ];
 
 // export function AppSidebar() {
@@ -205,53 +224,93 @@ export function AppSidebar() {
   );
 
 
-    // return (
-    //     <Sidebar collapsible="icon" variant="inset">
-    //         <SidebarHeader>
-    //             <SidebarMenu>
-    //                 <SidebarMenuItem>
-    //                     <SidebarMenuButton size="lg" asChild>
-    //                         <Link href="/dashboard" prefetch>
-    //                             <AppLogo />
-    //                         </Link>
-    //                     </SidebarMenuButton>
-    //                 </SidebarMenuItem>
-    //             </SidebarMenu>
-    //         </SidebarHeader>
+  // return (
+  //     <Sidebar collapsible="icon" variant="inset">
+  //         <SidebarHeader>
+  //             <SidebarMenu>
+  //                 <SidebarMenuItem>
+  //                     <SidebarMenuButton size="lg" asChild>
+  //                         <Link href="/dashboard" prefetch>
+  //                             <AppLogo />
+  //                         </Link>
+  //                     </SidebarMenuButton>
+  //                 </SidebarMenuItem>
+  //             </SidebarMenu>
+  //         </SidebarHeader>
 
-    //         <SidebarContent>
-    //             <NavMain items={mainNavItems} />
-    //         </SidebarContent>
+  //         <SidebarContent>
+  //             <NavMain items={mainNavItems} />
+  //         </SidebarContent>
 
-    //         <SidebarFooter>
-    //             <NavFooter items={footerNavItems} className="mt-auto" />
-    //             <NavUser />
-    //         </SidebarFooter>
-    //     </Sidebar>
-    // );
+  //         <SidebarFooter>
+  //             <NavFooter items={footerNavItems} className="mt-auto" />
+  //             <NavUser />
+  //         </SidebarFooter>
+  //     </Sidebar>
+  // );
   return (
-      <Sidebar collapsible="icon" variant="inset">
-        <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild>
-                <Link href="/dashboard" prefetch>
-                  <AppLogo />
+    // <Sidebar collapsible="icon" variant="inset">
+    //   <SidebarHeader>
+    //     <SidebarMenu>
+    //       {/* <SidebarMenuItem>
+    //         <SidebarMenuButton size="lg" asChild>
+    //           <Link href="/dashboard" prefetch>
+    //             <AppLogo />
+    //           </Link>
+    //         </SidebarMenuButton>
+    //       </SidebarMenuItem> */}
+
+
+    //     </SidebarMenu>
+    //   </SidebarHeader>
+
+    //   <SidebarContent>
+    //     <NavMain items={filteredNavItems} />
+    //   </SidebarContent>
+
+    //   <SidebarFooter>
+    //     <NavFooter items={footerNavItems} className="mt-auto" />
+    //     <NavUser />
+    //   </SidebarFooter>
+    // </Sidebar>
+    <Sidebar collapsible="icon" variant="inset">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href="/dashboard" prefetch>
+                <AppLogo />
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
+      <SidebarContent>
+        {/* Render all main menu items with filtering & custom styling */}
+        <SidebarMenu>
+          {filteredNavItems.map((item) => (
+            <SidebarMenuItem key={item.href}>
+              <SidebarMenuButton
+                asChild
+                className={item.className ?? ''}
+              >
+                <Link href={item.href}>
+                  <item.icon className={`mr-2 ${item.iconClassName ?? ''}`} />
+                  {item.title}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
 
-        <SidebarContent>
-          <NavMain items={filteredNavItems} />
-        </SidebarContent>
+      <SidebarFooter>
+        <NavFooter items={footerNavItems} className="mt-auto" />
+        <NavUser />
+      </SidebarFooter>
+    </Sidebar>
 
-        <SidebarFooter>
-          <NavFooter items={footerNavItems} className="mt-auto" />
-          <NavUser />
-        </SidebarFooter>
-      </Sidebar>
-    );
-  
+  );
+
 }

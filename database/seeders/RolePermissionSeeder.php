@@ -28,6 +28,7 @@ class RolePermissionSeeder extends Seeder
             'self attendance' => ['view', 'create'],
             'dashboard' => ['view'],
             'dashboard super' => ['view'],
+            'dashboard manager' => ['view'],
         ];
 
         $extraPermissions = [
@@ -55,26 +56,24 @@ class RolePermissionSeeder extends Seeder
             'Super Admin' => Permission::all()->pluck('name')->toArray(),
 
             'Manager' => [
-                'view companies', 'create companies',
-                'view departments', 'create departments',
-                'view locations', 'create locations',
-                'view work schedule types', 'create work schedule types',
-                'view employees', 'create employees',
-                'view attendances', 'create attendances',
-                'view working hours', 'create working hours',
+                'view departments',
+                'create departments',
+                'view locations',
+                'create locations',
+                'view work schedule types',
+                'create work schedule types',
+                'view employees',
+                'create employees',
+                'view attendances',
+                'create attendances',
+                'view working hours',
+                'create working hours',
                 'view attendance reports',
-                'view dashboard',
+                'view dashboard manager',
                 'export attendance reports',
             ],
 
             'Employee' => [
-                'view companies',
-                'view departments',
-                'view locations',
-                'view work schedule types',
-                'view employees',
-                'view attendances',
-                'view working hours',
                 'view attendance reports',
                 'export attendance reports',
                 'view self attendance',

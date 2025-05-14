@@ -33,6 +33,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware(['auth', 'verified'])
         ->name('employee.dashboard');
 
+    // Manager dashboard
+    Route::get('/manager/dashboard', [DashboardController::class, 'managerDashboard'])
+        ->middleware(['auth', 'verified'])
+        ->name('manager.dashboard');
+
     // Admin/Manager dashboard
     Route::get('/dashboard', DashboardController::class)
         ->name('dashboard')
@@ -105,15 +110,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Attendances
     Route::resource('attendances', AttendanceController::class);
-        // ->middleware([
-        //     'index' => 'permission:view attendances',
-        //     'create' => 'permission:create attendances',
-        //     'store' => 'permission:create attendances',
-        //     'edit' => 'permission:edit attendances',
-        //     'update' => 'permission:edit attendances',
-        //     'destroy' => 'permission:delete attendances',
-        //     'show' => 'permission:view attendances',
-        // ]);
+    // ->middleware([
+    //     'index' => 'permission:view attendances',
+    //     'create' => 'permission:create attendances',
+    //     'store' => 'permission:create attendances',
+    //     'edit' => 'permission:edit attendances',
+    //     'update' => 'permission:edit attendances',
+    //     'destroy' => 'permission:delete attendances',
+    //     'show' => 'permission:view attendances',
+    // ]);
 
     Route::get('/attendance/generate', function () {
         return Inertia::render('attendances/generate');
@@ -141,7 +146,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('permission:export attendance reports')
         ->name('attendances.report.export');
 
-        Route::get('/my-attendance', [AttendanceReportController::class, 'myAttendance']);
+    Route::get('/my-attendance', [AttendanceReportController::class, 'myAttendance']);
 
     // Users
     Route::resource('users', UserController::class)

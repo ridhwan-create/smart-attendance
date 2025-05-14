@@ -52,7 +52,7 @@ class DashboardController extends Controller
 
         $locationsByCompany = Company::withCount('locations')
             ->get()
-            ->map(fn ($company) => [
+            ->map(fn($company) => [
                 'name' => $company->company_name,
                 'location_count' => $company->locations_count,
             ]);
@@ -83,49 +83,49 @@ class DashboardController extends Controller
                 $query->whereDate('check_in_time', $today);
             },
         ])
-        ->get()
-        ->map(fn ($company) => [
-            'name' => $company->company_name,
-            'location_count' => $company->locations_count,
-            'employee_count' => $company->employees_count,
-            'attendance_count' => $company->attendances_count, // already filtered to today
-            'today_attendance_count' => $company->today_attendance_count,
-            'late' => $company->late_count,
-            'early_leave' => $company->early_leave_count,
-            'late_percentage' => $company->attendances_count > 0
-                ? round($company->late_count / $company->attendances_count * 100, 1)
-                : 0,
-            'early_leave_percentage' => $company->attendances_count > 0
-                ? round($company->early_leave_count / $company->attendances_count * 100, 1)
-                : 0,
-            'present_percentage' => $company->employees_count > 0
-                ? round($company->today_attendance_count / $company->employees_count * 100, 1)
-                : 0,
-            'absent_count' => max($company->employees_count - $company->today_attendance_count, 0),
-            'absent_percentage' => $company->employees_count > 0
-                ? round(($company->employees_count - $company->today_attendance_count) / $company->employees_count * 100, 1)
-                : 0,
-        ]);
-        
-    
-            
-            $companies = Company::all();
+            ->get()
+            ->map(fn($company) => [
+                'name' => $company->company_name,
+                'location_count' => $company->locations_count,
+                'employee_count' => $company->employees_count,
+                // 'attendance_count' => $company->attendances_count, // already filtered to today
+                'today_attendance_count' => $company->today_attendance_count,
+                'late' => $company->late_count,
+                'early_leave' => $company->early_leave_count,
+                'late_percentage' => $company->today_attendance_count > 0
+                    ? round($company->late_count / $company->today_attendance_count * 100, 1)
+                    : 0,
+                'early_leave_percentage' => $company->attendances_count > 0
+                    ? round($company->early_leave_count / $company->attendances_count * 100, 1)
+                    : 0,
+                'present_percentage' => $company->employees_count > 0
+                    ? round($company->today_attendance_count / $company->employees_count * 100, 1)
+                    : 0,
+                'absent_count' => max($company->employees_count - $company->today_attendance_count, 0),
+                'absent_percentage' => $company->employees_count > 0
+                    ? round(($company->employees_count - $company->today_attendance_count) / $company->employees_count * 100, 1)
+                    : 0,
+            ]);
 
-            $lateEarlyByCompany = $companies->map(function ($company) {
-                $attendances = Attendance::where('company_id', $company->id)->get();
-                $total = $attendances->count();
-                $late = $attendances->where('is_late', true)->count();
-                $earlyLeave = $attendances->where('is_early_leave', true)->count();
-            
-                return [
-                    'company' => $company->company_name,
-                    'total_attendances' => $total,
-                    'late' => $late,
-                    'early_leave' => $earlyLeave,
-                    'late_percentage' => $total > 0 ? round($late / $total * 100, 1) : 0,
-                    'early_leave_percentage' => $total > 0 ? round($earlyLeave / $total * 100, 1) : 0,
-                ];
-            });
+
+
+        $companies = Company::all();
+
+        $lateEarlyByCompany = $companies->map(function ($company) {
+            $attendances = Attendance::where('company_id', $company->id)->get();
+            $total = $attendances->count();
+            $late = $attendances->where('is_late', true)->count();
+            $earlyLeave = $attendances->where('is_early_leave', true)->count();
+
+            return [
+                'company' => $company->company_name,
+                'total_attendances' => $total,
+                'late' => $late,
+                'early_leave' => $earlyLeave,
+                'late_percentage' => $total > 0 ? round($late / $total * 100, 1) : 0,
+                'early_leave_percentage' => $total > 0 ? round($earlyLeave / $total * 100, 1) : 0,
+            ];
+        });
 
 
         // return Inertia::render('AttendanceSummary', [
@@ -154,22 +154,21 @@ class DashboardController extends Controller
                 'late_early_by_company' => $lateEarlyByCompany,
             ],
         ]);
-        
     }
-    
+
     // public function employeeDashboard()
     // {
     //     $user = Auth::user();
-    
+
     //     // Pastikan eager loading untuk elak N+1 query
     //     $employee = $user->employee()->with('location')->first();
-    
-    
+
+
     //     $today = Carbon::today();
     //     $attendance = Attendance::where('employee_id', optional($employee)->id)
     //         ->whereDate('check_in_time', $today)
     //         ->first();
-    
+
     //     return Inertia::render('EmployeeDashboard', [
     //         'employee' => [
     //             'name' => $user->name,
@@ -187,15 +186,15 @@ class DashboardController extends Controller
     //         ],
     //     ]);
     // }
-    
+
     public function employeeDashboard()
     {
         $user = Auth::user();
         $today = Carbon::today();
-    
+
         // Load employee with location and company
         $employee = $user->employee()->with(['location', 'company'])->first();
-    
+
         // Dapatkan rekod kehadiran untuk hari ini
         $attendance = null;
         if ($employee) {
@@ -203,7 +202,7 @@ class DashboardController extends Controller
                 ->whereDate('check_in_time', $today)
                 ->first();
         }
-    
+
         return Inertia::render('EmployeeDashboard', [
             'employee' => [
                 'name' => $user->name,
@@ -224,6 +223,57 @@ class DashboardController extends Controller
             ],
         ]);
     }
-    
 
+    public function managerDashboard()
+    {
+        $user = Auth::user();
+        $today = Carbon::today();
+
+        // Get the manager's company
+        $employee = $user->employee()->with('company')->first();
+        $company = $employee->company;
+
+        // Get company statistics
+        $companyStats = [
+            'name' => $company->company_name,
+            'location_count' => $company->locations()->count(),
+            'employee_count' => $company->employees()->count(),
+            'today_attendance_count' => $company->attendances()->whereDate('check_in_time', $today)->count(),
+            'late' => $company->attendances()->where('is_late', true)->whereDate('check_in_time', $today)->count(),
+            'early_leave' => $company->attendances()->where('is_early_leave', true)->whereDate('check_in_time', $today)->count(),
+            'absent_count' => max($company->employees()->count() - $company->attendances()->whereDate('check_in_time', $today)->count(), 0),
+        ];
+
+        // Calculate percentages
+        $companyStats['present_percentage'] = $companyStats['employee_count'] > 0
+            ? round($companyStats['today_attendance_count'] / $companyStats['employee_count'] * 100, 1)
+            : 0;
+        $companyStats['absent_percentage'] = $companyStats['employee_count'] > 0
+            ? round($companyStats['absent_count'] / $companyStats['employee_count'] * 100, 1)
+            : 0;
+        $companyStats['late_percentage'] = $companyStats['today_attendance_count'] > 0
+            ? round($companyStats['late'] / $companyStats['today_attendance_count'] * 100, 1)
+            : 0;
+        $companyStats['early_leave_percentage'] = $companyStats['today_attendance_count'] > 0
+            ? round($companyStats['early_leave'] / $companyStats['today_attendance_count'] * 100, 1)
+            : 0;
+
+        // Get historical stats
+        $totalAttendances = $company->attendances()->count();
+        $totalLate = $company->attendances()->where('is_late', true)->count();
+        $totalEarlyLeave = $company->attendances()->where('is_early_leave', true)->count();
+
+        return Inertia::render('ManagerDashboard', [
+            'summary' => [
+                'company' => $companyStats,
+                'stats' => [
+                    'total_attendances' => $totalAttendances,
+                    'late' => $totalLate,
+                    'early_leave' => $totalEarlyLeave,
+                    'late_percentage' => $totalAttendances > 0 ? round($totalLate / $totalAttendances * 100, 1) : 0,
+                    'early_leave_percentage' => $totalAttendances > 0 ? round($totalEarlyLeave / $totalAttendances * 100, 1) : 0,
+                ],
+            ],
+        ]);
+    }
 }

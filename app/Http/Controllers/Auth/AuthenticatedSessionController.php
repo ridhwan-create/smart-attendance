@@ -41,25 +41,28 @@ class AuthenticatedSessionController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-    
+
         if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             $request->session()->regenerate();
-    
+
             $user = \App\Models\User::find(auth()->id());
-    
+
             if ($user->hasRole('Employee')) {
                 return redirect()->route('employee.dashboard');
             }
-    
+            if ($user->hasRole('Manager')) {
+                return redirect()->route('manager.dashboard');
+            }
+
             return redirect()->route('dashboard');
         }
-    
+
         return back()->withErrors([
             'email' => 'These credentials do not match our records.',
         ]);
     }
-    
-    
+
+
 
     /**
      * Destroy an authenticated session.
