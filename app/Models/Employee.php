@@ -11,6 +11,7 @@ class Employee extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'employee_number',
         'ic_number',
         'name',
         'email',
@@ -47,5 +48,4 @@ class Employee extends Model
     {
         return $this->hasMany(\App\Models\Attendance::class);
     }
-
 }

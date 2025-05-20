@@ -103,11 +103,7 @@ const mainNavItems: NavItem[] = [
     href: '/employee/dashboard',
     icon: Clock,
     permission: 'view self attendance',
-    className: 'bg-red-600',
-    badge: {
-      text: 'ATTEND NOW',
-      color: 'bg-white text-primary-600'
-    },
+    className: 'font-bold text-red-600', // ✅ Tambahkan ini
     highlight: true,
   },
   {
@@ -278,7 +274,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard" prefetch>
+              <Link href="#" prefetch>
                 <AppLogo />
               </Link>
             </SidebarMenuButton>
@@ -289,18 +285,17 @@ export function AppSidebar() {
       <SidebarContent>
         {/* Render all main menu items with filtering & custom styling */}
         <SidebarMenu>
-          {filteredNavItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                className={item.className ?? ''}
-              >
-                <Link href={item.href}>
-                  <item.icon className={`mr-2 ${item.iconClassName ?? ''}`} />
-                  {item.title}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+          {filteredNavItems.map((item, index) => (
+            <>
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton asChild className={item.className ?? ''}>
+                  <Link href={item.href}>
+                    <item.icon className={`mr-2 ${item.iconClassName ?? ''}`} />
+                    {item.title}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </>
           ))}
         </SidebarMenu>
       </SidebarContent>

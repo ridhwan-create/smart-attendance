@@ -26,139 +26,141 @@ class AttendanceController extends Controller
         $this->middleware('permission:delete attendances')->only(['destroy']);
     }
 
-        // Fungsi ini dipanggil oleh scheduler pada 1hb setiap bulan
-        // public function generateMonthlyAttendance()
-        // {
-        //     $today = Carbon::now();
-        //     $firstDayOfMonth = $today->copy()->startOfMonth();
-        //     $lastDayOfMonth = $today->copy()->endOfMonth();
-    
-        //     $employees = Employee::all();
-    
-        //     DB::beginTransaction();
-    
-        //     try {
-        //         foreach ($employees as $employee) {
-        //             // Loop setiap hari dalam bulan
-        //             for ($date = $firstDayOfMonth->copy(); $date->lte($lastDayOfMonth); $date->addDay()) {
-        //                 Attendance::firstOrCreate([
-        //                     'employee_id' => $employee->id,
-        //                     'company_id' => $employee->company_id,
-        //                     'work_schedule_type_id' => $employee->work_schedule_type_id ?? null,
-        //                     'name' => $employee->name,
-        //                     'ic_number' => $employee->ic_number,
-        //                     'notes' => null,
-        //                     'status' => 'absent', // Default absent
-        //                     'check_in_time' => null,
-        //                     'check_out_time' => null,
-        //                     'location_id' => null,
-        //                     'latitude' => null,
-        //                     'longitude' => null,
-        //                     'created_by' => Auth::id() ?? 1, // fallback admin ID
-        //                     'updated_by' => Auth::id() ?? 1,
-        //                     'created_at' => $date,
-        //                     'updated_at' => $date,
-        //                 ]);
-        //             }
-        //         }
-    
-        //         DB::commit();
-        //         return response()->json(['message' => 'Monthly attendances generated successfully.']);
-        //     } catch (\Exception $e) {
-        //         DB::rollBack();
-        //         return response()->json(['message' => 'Failed to generate attendances.', 'error' => $e->getMessage()], 500);
-        //     }
-        // }
-        public function generateMonthlyAttendance()
-        {
-            $today = Carbon::now();
-            $firstDayOfMonth = $today->copy()->startOfMonth();
-            $lastDayOfMonth = $today->copy()->endOfMonth();
-        
-            $month = $today->format('Y-m'); // Format sebagai '2025-04'
-        
-            $employees = Employee::all();
-        
-            DB::beginTransaction();
-        
-            try {
-                // foreach ($employees as $employee) {
-                //     // Semak jika rekod sudah wujud untuk bulan ini bagi pekerja
-                //     $attendanceExists = Attendance::where('employee_id', $employee->id)
-                //         ->whereBetween('date_of_month', [$firstDayOfMonth, $lastDayOfMonth])
-                //         ->exists();
-        
-                //     if ($attendanceExists) {
-                //         // Jika rekod sudah wujud, langkau pekerja ini
-                //         continue;
-                //     }
-        
-                //     for ($date = $firstDayOfMonth->copy(); $date->lte($lastDayOfMonth); $date->addDay()) {
-                //         Attendance::create([
-                //             'employee_id' => $employee->id,
-                //             'company_id' => $employee->company_id,
-                //             'work_schedule_type_id' => $employee->work_schedule_type_id ?? null,
-                //             'name' => $employee->name,
-                //             'ic_number' => $employee->ic_number,
-                //             'notes' => null,
-                //             'status' => 'absent',
-                //             'date_of_month' => $date->toDateString(),
-                //             'check_in_time' => null,
-                //             'check_out_time' => null,
-                //             'location_id' => null,
-                //             'latitude' => null,
-                //             'longitude' => null,
-                //             'created_by' => 1,
-                //             'updated_by' => 1,
-                //             'created_at' => $date,
-                //             'updated_at' => $date,
-                //         ]);
-                //     }
-                // }
-                foreach ($employees as $employee) {
-                    // Ambil semua rekod kehadiran sedia ada untuk bulan ini
-                    $existingDates = Attendance::where('employee_id', $employee->id)
-                        ->whereBetween('date_of_month', [$firstDayOfMonth, $lastDayOfMonth])
-                        ->pluck('date_of_month')
-                        ->map(fn ($d) => Carbon::parse($d)->toDateString())
-                        ->toArray();
-                
-                    for ($date = $firstDayOfMonth->copy(); $date->lte($lastDayOfMonth); $date->addDay()) {
-                        if (in_array($date->toDateString(), $existingDates)) {
-                            continue; // Hari ini sudah wujud
-                        }
-                
-                        Attendance::create([
-                            'employee_id' => $employee->id,
-                            'company_id' => $employee->company_id,
-                            'work_schedule_type_id' => $employee->work_schedule_type_id ?? null,
-                            'name' => $employee->name,
-                            'ic_number' => $employee->ic_number,
-                            'notes' => null,
-                            'status' => 'absent',
-                            'date_of_month' => $date->toDateString(),
-                            'check_in_time' => null,
-                            'check_out_time' => null,
-                            'location_id' => $employee->location_id,
-                            'latitude' => null,
-                            'longitude' => null,
-                            'created_by' => 1,
-                            'updated_by' => 1,
-                            'created_at' => $date,
-                            'updated_at' => $date,
-                        ]);
+    // Fungsi ini dipanggil oleh scheduler pada 1hb setiap bulan
+    // public function generateMonthlyAttendance()
+    // {
+    //     $today = Carbon::now();
+    //     $firstDayOfMonth = $today->copy()->startOfMonth();
+    //     $lastDayOfMonth = $today->copy()->endOfMonth();
+
+    //     $employees = Employee::all();
+
+    //     DB::beginTransaction();
+
+    //     try {
+    //         foreach ($employees as $employee) {
+    //             // Loop setiap hari dalam bulan
+    //             for ($date = $firstDayOfMonth->copy(); $date->lte($lastDayOfMonth); $date->addDay()) {
+    //                 Attendance::firstOrCreate([
+    //                     'employee_id' => $employee->id,
+    //                     'company_id' => $employee->company_id,
+    //                     'work_schedule_type_id' => $employee->work_schedule_type_id ?? null,
+    //                     'name' => $employee->name,
+    //                     'ic_number' => $employee->ic_number,
+    //                     'notes' => null,
+    //                     'status' => 'absent', // Default absent
+    //                     'check_in_time' => null,
+    //                     'check_out_time' => null,
+    //                     'location_id' => null,
+    //                     'latitude' => null,
+    //                     'longitude' => null,
+    //                     'created_by' => Auth::id() ?? 1, // fallback admin ID
+    //                     'updated_by' => Auth::id() ?? 1,
+    //                     'created_at' => $date,
+    //                     'updated_at' => $date,
+    //                 ]);
+    //             }
+    //         }
+
+    //         DB::commit();
+    //         return response()->json(['message' => 'Monthly attendances generated successfully.']);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json(['message' => 'Failed to generate attendances.', 'error' => $e->getMessage()], 500);
+    //     }
+    // }
+    public function generateMonthlyAttendance()
+    {
+        $today = Carbon::now();
+        $firstDayOfMonth = $today->copy()->startOfMonth();
+        $lastDayOfMonth = $today->copy()->endOfMonth();
+
+        $month = $today->format('Y-m'); // Format sebagai '2025-04'
+
+        $employees = Employee::all();
+
+        DB::beginTransaction();
+
+        try {
+            // foreach ($employees as $employee) {
+            //     // Semak jika rekod sudah wujud untuk bulan ini bagi pekerja
+            //     $attendanceExists = Attendance::where('employee_id', $employee->id)
+            //         ->whereBetween('date_of_month', [$firstDayOfMonth, $lastDayOfMonth])
+            //         ->exists();
+
+            //     if ($attendanceExists) {
+            //         // Jika rekod sudah wujud, langkau pekerja ini
+            //         continue;
+            //     }
+
+            //     for ($date = $firstDayOfMonth->copy(); $date->lte($lastDayOfMonth); $date->addDay()) {
+            //         Attendance::create([
+            //             'employee_id' => $employee->id,
+            //             'company_id' => $employee->company_id,
+            //             'work_schedule_type_id' => $employee->work_schedule_type_id ?? null,
+            //             'name' => $employee->name,
+            //             'ic_number' => $employee->ic_number,
+            //             'notes' => null,
+            //             'status' => 'absent',
+            //             'date_of_month' => $date->toDateString(),
+            //             'check_in_time' => null,
+            //             'check_out_time' => null,
+            //             'location_id' => null,
+            //             'latitude' => null,
+            //             'longitude' => null,
+            //             'created_by' => 1,
+            //             'updated_by' => 1,
+            //             'created_at' => $date,
+            //             'updated_at' => $date,
+            //         ]);
+            //     }
+            // }
+            foreach ($employees as $employee) {
+                // Ambil semua rekod kehadiran sedia ada untuk bulan ini
+                $existingDates = Attendance::where('employee_id', $employee->id)
+                    ->whereBetween('date_of_month', [$firstDayOfMonth, $lastDayOfMonth])
+                    ->pluck('date_of_month')
+                    ->map(fn($d) => Carbon::parse($d)->toDateString())
+                    ->toArray();
+
+                for ($date = $firstDayOfMonth->copy(); $date->lte($lastDayOfMonth); $date->addDay()) {
+                    if (in_array($date->toDateString(), $existingDates)) {
+                        continue; // Hari ini sudah wujud
                     }
+
+                    Attendance::create([
+                        'employee_id' => $employee->id,
+                        'company_id' => $employee->company_id,
+                        'department_id' => $employee->department_id,
+                        'work_schedule_type_id' => $employee->work_schedule_type_id ?? null,
+                        'name' => $employee->name,
+                        'employee_number' => $employee->employee_number,
+                        'ic_number' => $employee->ic_number,
+                        'notes' => null,
+                        'status' => 'absent',
+                        'date_of_month' => $date->toDateString(),
+                        'check_in_time' => null,
+                        'check_out_time' => null,
+                        'location_id' => $employee->location_id,
+                        'latitude' => null,
+                        'longitude' => null,
+                        'created_by' => 1,
+                        'updated_by' => 1,
+                        'created_at' => $date,
+                        'updated_at' => $date,
+                    ]);
                 }
-                
-        
-                DB::commit();
-                return response()->json(['message' => 'Monthly attendances generated successfully.']);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return response()->json(['message' => 'Failed to generate attendances.', 'error' => $e->getMessage()], 500);
             }
+
+
+            DB::commit();
+            return response()->json(['message' => 'Monthly attendances generated successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to generate attendances.', 'error' => $e->getMessage()], 500);
         }
-        
+    }
+
 
     // public function index(): Response
     // {
@@ -171,34 +173,42 @@ class AttendanceController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->input('search');
-    
+
         $attendances = Attendance::with(['employee', 'company', 'location', 'workScheduleType'])
-            ->when($search, fn ($query) =>
+            ->when(
+                $search,
+                fn($query) =>
                 $query->where(function ($q) use ($search) {
-                    $q->whereHas('employee', fn ($q2) =>
+                    $q->whereHas(
+                        'employee',
+                        fn($q2) =>
                         $q2->where('name', 'like', "%{$search}%")
-                           ->orWhere('ic_number', 'like', "%{$search}%")
+                            ->orWhere('ic_number', 'like', "%{$search}%")
                     )
-                    ->orWhereHas('location', fn ($q2) =>
-                        $q2->where('name', 'like', "%{$search}%")
-                    )
-                    ->orWhereHas('company', fn ($q2) =>
-                    $q2->where('company_name', 'like', "%{$search}%")
-                );
+                        ->orWhereHas(
+                            'location',
+                            fn($q2) =>
+                            $q2->where('name', 'like', "%{$search}%")
+                        )
+                        ->orWhereHas(
+                            'company',
+                            fn($q2) =>
+                            $q2->where('company_name', 'like', "%{$search}%")
+                        );
                 })
             )
             ->orderBy('date_of_month', 'asc')
             ->paginate(30)
             ->withQueryString();
-    
+
         return Inertia::render('attendances/index', [
             'attendances' => $attendances,
             'filters' => [
                 'search' => $search,
             ],
         ]);
-    }    
-    
+    }
+
 
     // public function create(): Response
     // {
@@ -293,8 +303,8 @@ class AttendanceController extends Controller
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
         $a = sin($dLat / 2) * sin($dLat / 2) +
-             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-             sin($dLon / 2) * sin($dLon / 2);
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
         return $R * $c;
     }
@@ -353,7 +363,6 @@ class AttendanceController extends Controller
             'locations' => $locations,
         ]);
     }
-
 }
 
 // class AttendanceController extends Controller

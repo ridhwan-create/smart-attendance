@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Location, Attendance, WorkingHour, WorkScheduleType};
+use App\Models\{Location, Attendance, WorkingHour, WorkScheduleType, HRMSAttendance};
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceSelfController extends Controller
 {
@@ -14,8 +15,13 @@ class AttendanceSelfController extends Controller
     {
         $user = Auth::user();
         $employee = $user->employee;
-
         $userLocation = $employee?->location;
+
+        // Get today's attendance record
+        $today = now()->toDateString();
+        $todayAttendance = Attendance::where('employee_id', $employee->id)
+            ->where('date_of_month', $today)
+            ->first();
 
         return Inertia::render('attendances/self', [
             'userLocation' => $userLocation ? [
@@ -25,6 +31,12 @@ class AttendanceSelfController extends Controller
                 'latitude' => $userLocation->latitude,
                 'longitude' => $userLocation->longitude,
             ] : null,
+            'attendanceStatus' => [
+                'hasCheckedIn' => $todayAttendance ? !is_null($todayAttendance->check_in_time) : false,
+                'hasCheckedOut' => $todayAttendance ? !is_null($todayAttendance->check_out_time) : false,
+                'checkInTime' => $todayAttendance ? $todayAttendance->check_in_time : null,
+                'checkOutTime' => $todayAttendance ? $todayAttendance->check_out_time : null,
+            ]
         ]);
     }
 
@@ -111,7 +123,7 @@ class AttendanceSelfController extends Controller
             $todayAttendance->check_in_time = $now;
             if (Carbon::parse($todayAttendance->date_of_month)->isSameDay($today)) {
                 $todayAttendance->status = 'present';
-            }            
+            }
 
             if ($isFlexible && $now->gt($flexEnd)) {
                 $todayAttendance->is_late = true;
@@ -130,14 +142,11 @@ class AttendanceSelfController extends Controller
                 return back()->withErrors(['type' => 'You need to check in first before checking out.']);
             }
 
-            if ($todayAttendance->check_out_time) {
-                return back()->withErrors(['type' => 'You have already checked out today.']);
-            }
-
             if ($now->lt($startTime) || $now->gt($endTime->copy()->addHours(2))) {
                 return back()->withErrors(['check_out_time' => 'Check-out time is outside allowed working hours.']);
             }
 
+            $previousCheckOut = $todayAttendance->check_out_time;
             $todayAttendance->check_out_time = $now;
 
             if ($now->lt($endTime)) {
@@ -147,6 +156,15 @@ class AttendanceSelfController extends Controller
                 $todayAttendance->is_early_leave = false;
                 $todayAttendance->early_leave_duration = null;
             }
+
+            if ($previousCheckOut) {
+                Log::info("Employee multiple check-out", [
+                    'employee_id' => $employee->id,
+                    'date' => $today,
+                    'previous_check_out' => $previousCheckOut,
+                    'new_check_out' => $now,
+                ]);
+            }
         }
 
         $todayAttendance->latitude = $request->latitude;
@@ -155,6 +173,34 @@ class AttendanceSelfController extends Controller
 
         try {
             $todayAttendance->save();
+
+            try {
+                HRMSAttendance::updateOrCreate(
+                    [
+                        'no_pekerja' => $employee->employee_number,
+                        'date' => $today,
+                    ],
+                    [
+                        'day' => $now->format('l'),
+                        'time_in' => $todayAttendance->check_in_time,
+                        'time_out' => $todayAttendance->check_out_time,
+                        'id_bahagian' => $employee->department_id,
+                        'terminalDeviceId' => '100',
+                    ]
+                );
+
+                Log::info("HRMS Attendance synced successfully", [
+                    'employee' => $employee->employee_number,
+                    'date' => $today,
+                ]);
+            } catch (\Exception $e) {
+                Log::error("HRMS Attendance Sync Failed", [
+                    'error' => $e->getMessage(),
+                    'employee_id' => $employee->id,
+                    'date' => $today,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
         } catch (\Exception $e) {
             return back()->withErrors(['database' => 'Failed to save attendance record.']);
         }

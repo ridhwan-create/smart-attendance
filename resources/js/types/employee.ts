@@ -3,6 +3,7 @@ import { Department } from './department';
 
 export interface Employee {
     id: number;
+    employee_number: number;
     ic_number: string;
     name: string;
     email: string;

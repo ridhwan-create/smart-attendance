@@ -5,12 +5,20 @@ import { Location } from '@/types';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import toast from 'react-hot-toast';
+// Tambahkan import ini di bagian atas file
+import { Toaster } from 'react-hot-toast';
 
 interface PageProps {
     userLocation: Location;
+    attendanceStatus: {
+        hasCheckedIn: boolean;
+        hasCheckedOut: boolean;
+        checkInTime: string | null;
+        checkOutTime: string | null;
+    };
 }
 
-export default function SelfAttendance({ userLocation }: PageProps) {
+export default function SelfAttendance({ userLocation, attendanceStatus }: PageProps) {
     const [currentLocation, setCurrentLocation] = useState<{ lat: number | string; lng: number | string }>({ lat: '-', lng: '-' });
     const [distance, setDistance] = useState<number | null>(null);
     const [isInRadius, setIsInRadius] = useState(false);
@@ -72,10 +80,10 @@ export default function SelfAttendance({ userLocation }: PageProps) {
             distance: distance ?? null,
         }, {
             onSuccess: () => {
-                alert(`${type === 'check_in' ? 'Clock-In' : 'Clock-Out'} successful.`);
+                toast.success(`${type === 'check_in' ? 'Clock-In' : 'Clock-Out'} successful.`);
             },
             onError: (errors) => {
-                alert(Object.values(errors).join('\n'));
+                toast.error(Object.values(errors).join('\n'));
             },
             onFinish: () => {
                 setIsSubmitting(false);
@@ -86,6 +94,38 @@ export default function SelfAttendance({ userLocation }: PageProps) {
     return (
         <AppLayout>
             <Head title="Employee Dashboard" />
+            <Toaster
+                position="top-right"
+                reverseOrder={false}
+                gutter={8}
+                containerClassName=""
+                containerStyle={{}}
+                toastOptions={{
+                    className: '',
+                    duration: 5000,
+                    style: {
+                        background: '#ffffff',
+                        color: '#333',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                        padding: '16px',
+                        fontSize: '14px',
+                    },
+                    success: {
+                        duration: 4000,
+                        iconTheme: {
+                            primary: '#10B981',
+                            secondary: '#ffffff',
+                        },
+                    },
+                    error: {
+                        duration: 6000,
+                        iconTheme: {
+                            primary: '#EF4444',
+                            secondary: '#ffffff',
+                        },
+                    },
+                }}
+            />
             <div className="p-6 space-y-6">
                 <div className="p-4 sm:p-6">
                     <Head title="Smart Attendance Registration" />
@@ -97,6 +137,16 @@ export default function SelfAttendance({ userLocation }: PageProps) {
                                 <h2 className="font-semibold text-base mb-2">Your Current Location</h2>
                                 <p className="text-sm">Latitude: {currentLocation.lat}</p>
                                 <p className="text-sm">Longitude: {currentLocation.lng}</p>
+                                {attendanceStatus.hasCheckedIn && (
+                                    <p className="text-sm mt-2">
+                                        Checked in at: {new Date(attendanceStatus.checkInTime || '').toLocaleTimeString()}
+                                    </p>
+                                )}
+                                {attendanceStatus.hasCheckedOut && (
+                                    <p className="text-sm mt-1">
+                                        Last checked out at: {new Date(attendanceStatus.checkOutTime || '').toLocaleTimeString()}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="mt-4 sm:mt-0 sm:ml-6 flex items-center space-x-6">
@@ -159,29 +209,33 @@ export default function SelfAttendance({ userLocation }: PageProps) {
                             </table>
 
                             <div className="flex flex-col sm:flex-row sm:justify-start gap-3 pt-4">
-                                <button
-                                    onClick={() => handleClock('check_in')}
-                                    disabled={!isInRadius || isSubmitting}
-                                    className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 shadow-sm 
-                                        ${isInRadius
-                                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
-                                        ${isSubmitting ? 'opacity-60 cursor-wait' : ''}`}
-                                >
-                                    {isSubmitting ? 'Processing...' : 'Clock-In'}
-                                </button>
+                                {!attendanceStatus.hasCheckedIn && (
+                                    <button
+                                        onClick={() => handleClock('check_in')}
+                                        disabled={!isInRadius || isSubmitting}
+                                        className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 shadow-sm 
+                                            ${isInRadius
+                                                ? 'bg-green-600 hover:bg-green-700 text-white'
+                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+                                            ${isSubmitting ? 'opacity-60 cursor-wait' : ''}`}
+                                    >
+                                        {isSubmitting ? 'Processing...' : 'Clock-In'}
+                                    </button>
+                                )}
 
-                                <button
-                                    onClick={() => handleClock('check_out')}
-                                    disabled={!isInRadius || isSubmitting}
-                                    className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 shadow-sm 
-                                        ${isInRadius
-                                            ? 'bg-red-600 hover:bg-red-700 text-white'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
-                                        ${isSubmitting ? 'opacity-60 cursor-wait' : ''}`}
-                                >
-                                    {isSubmitting ? 'Processing...' : 'Clock-Out'}
-                                </button>
+                                {attendanceStatus.hasCheckedIn && (
+                                    <button
+                                        onClick={() => handleClock('check_out')}
+                                        disabled={!isInRadius || isSubmitting}
+                                        className={`px-3 py-1.5 text-sm font-medium transition-colors duration-200 shadow-sm 
+                                            ${isInRadius
+                                                ? 'bg-red-600 hover:bg-red-700 text-white'
+                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+                                            ${isSubmitting ? 'opacity-60 cursor-wait' : ''}`}
+                                    >
+                                        {isSubmitting ? 'Processing...' : 'Clock-Out'}
+                                    </button>
+                                )}
 
                                 <a
                                     href="/employee/dashboard"

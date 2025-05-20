@@ -7,6 +7,7 @@ import { Employee } from './employee';
 export type Attendance = {
     id: number;
     employee_id: number;
+    employee_number: number;
     ic_number: string;
     name: string;
     date_of_month: string;
@@ -22,6 +23,7 @@ export type Attendance = {
     status: string;
     notes: string;
     company_id: number;
+    department_id: number;
     work_schedule_type_id: number;
     company?: Company;
     department?: Department;

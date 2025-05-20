@@ -57,16 +57,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
 
     // Departments
-    Route::resource('departments', DepartmentController::class)
-        ->middleware([
-            'index' => 'permission:view departments',
-            'create' => 'permission:create departments',
-            'store' => 'permission:create departments',
-            'edit' => 'permission:edit departments',
-            'update' => 'permission:edit departments',
-            'destroy' => 'permission:delete departments',
-            'show' => 'permission:view departments',
-        ]);
+    Route::resource('departments', DepartmentController::class);
+    // ->middleware([
+    //     'index' => 'permission:view departments',
+    //     'create' => 'permission:create departments',
+    //     'store' => 'permission:create departments',
+    //     'edit' => 'permission:edit departments',
+    //     'update' => 'permission:edit departments',
+    //     'destroy' => 'permission:delete departments',
+    //     'show' => 'permission:view departments',
+    // ]);
 
     // Locations
     Route::resource('locations', LocationController::class)
@@ -97,16 +97,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
 
     // Employees
-    Route::resource('employees', EmployeeController::class)
-        ->middleware([
-            'index' => 'permission:view employees',
-            'create' => 'permission:create employees',
-            'store' => 'permission:create employees',
-            'edit' => 'permission:edit employees',
-            'update' => 'permission:edit employees',
-            'destroy' => 'permission:delete employees',
-            'show' => 'permission:view employees',
-        ]);
+    Route::resource('employees', EmployeeController::class);
+    // ->middleware([
+    //     'index' => 'permission:view employees',
+    //     'create' => 'permission:create employees',
+    //     'store' => 'permission:create employees',
+    //     'edit' => 'permission:edit employees',
+    //     'update' => 'permission:edit employees',
+    //     'destroy' => 'permission:delete employees',
+    //     'show' => 'permission:view employees',
+    // ]);
 
     // Attendances
     Route::resource('attendances', AttendanceController::class);

@@ -28,6 +28,10 @@ export default function EmployeeShow({ employee }: Props) {
 
                 <div className="bg-white p-6 rounded-md shadow-sm border space-y-4">
                     <div>
+                        <p className="text-sm text-gray-500">Employee Number</p>
+                        <p className="font-medium">{employee.employee_number}</p>
+                    </div>
+                    <div>
                         <p className="text-sm text-gray-500">IC Number</p>
                         <p className="font-medium">{employee.ic_number}</p>
                     </div>

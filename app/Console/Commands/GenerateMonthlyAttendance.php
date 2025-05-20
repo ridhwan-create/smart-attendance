@@ -18,25 +18,25 @@ class GenerateMonthlyAttendance extends Command
         $today = Carbon::now();
         $firstDayOfMonth = $today->copy()->startOfMonth();
         $lastDayOfMonth = $today->copy()->endOfMonth();
-    
+
         $month = $today->format('Y-m'); // Format sebagai '2025-04'
-    
+
         $employees = Employee::all();
-    
+
         DB::beginTransaction();
-    
+
         try {
             // foreach ($employees as $employee) {
             //     // Semak jika rekod sudah wujud untuk bulan ini bagi pekerja
             //     $attendanceExists = Attendance::where('employee_id', $employee->id)
             //         ->whereBetween('date_of_month', [$firstDayOfMonth, $lastDayOfMonth])
             //         ->exists();
-    
+
             //     if ($attendanceExists) {
             //         // Jika rekod sudah wujud, langkau pekerja ini
             //         continue;
             //     }
-    
+
             //     for ($date = $firstDayOfMonth->copy(); $date->lte($lastDayOfMonth); $date->addDay()) {
             //         Attendance::create([
             //             'employee_id' => $employee->id,
@@ -64,19 +64,21 @@ class GenerateMonthlyAttendance extends Command
                 $existingDates = Attendance::where('employee_id', $employee->id)
                     ->whereBetween('date_of_month', [$firstDayOfMonth, $lastDayOfMonth])
                     ->pluck('date_of_month')
-                    ->map(fn ($d) => Carbon::parse($d)->toDateString())
+                    ->map(fn($d) => Carbon::parse($d)->toDateString())
                     ->toArray();
-            
+
                 for ($date = $firstDayOfMonth->copy(); $date->lte($lastDayOfMonth); $date->addDay()) {
                     if (in_array($date->toDateString(), $existingDates)) {
                         continue; // Hari ini sudah wujud
                     }
-            
+
                     Attendance::create([
                         'employee_id' => $employee->id,
                         'company_id' => $employee->company_id,
+                        'department_id' => $employee->department_id,
                         'work_schedule_type_id' => $employee->work_schedule_type_id ?? null,
                         'name' => $employee->name,
+                        'employee_number' => $employee->employee_number,
                         'ic_number' => $employee->ic_number,
                         'notes' => null,
                         'status' => 'absent',

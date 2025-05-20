@@ -81,6 +81,7 @@ export default function EmployeeIndex({ employees, filters }: PageProps) {
                         <thead>
                             <tr className="text-left text-sm bg-muted">
                                 <th className="p-3">#</th>
+                                <th className="p-3">Employee Number</th>
                                 <th className="p-3">IC Number</th>
                                 <th className="p-3">Name</th>
                                 <th className="p-3">Email</th>
@@ -102,6 +103,7 @@ export default function EmployeeIndex({ employees, filters }: PageProps) {
                                 employees.data.map((employee, index) => (
                                     <tr key={employee.id} className="border-t text-sm">
                                         <td className="p-3">{(employees.from ?? 0) + index}</td>
+                                        <td className="p-3">{employee.employee_number}</td>
                                         <td className="p-3">{employee.ic_number}</td>
                                         <td className="p-3">{employee.name}</td>
                                         <td className="p-3">{employee.email}</td>

@@ -22,10 +22,6 @@ export interface NavItem {
     isActive?: boolean;
     permission?: string; // ⬅️ Tambahan ini
     className?: string; // Add optional className
-    badge?: {        // Add optional badge
-        text: string;
-        color: string;
-    };
     highlight?: boolean; // Add highlight flag
     iconClassName?: string; // Add icon-specific className
 }

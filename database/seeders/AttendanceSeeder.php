@@ -18,7 +18,8 @@ class AttendanceSeeder extends Seeder
         $employees = Employee::with('location')->get()->shuffle();
 
         // Ambil 100 pekerja rawak, ubah nilai kalau perlu
-        foreach ($employees->take(100) as $employee) {
+        foreach ($employees->take(1) as $employee) {
+            // foreach ($employees->all() as $employee) {
             $location = $employee->location ?? Location::inRandomOrder()->first();
             $companyId = $employee->company_id;
 
@@ -59,7 +60,9 @@ class AttendanceSeeder extends Seeder
 
                 Attendance::create([
                     'employee_id'           => $employee->id,
+                    'employee_number'       => $employee->employee_number,
                     'ic_number'             => $employee->ic_number,
+                    'date_of_month'         => $date->toDateString(),
                     'name'                  => $employee->name,
                     'check_in_time'         => $checkIn,
                     'is_late'               => $isLate,
@@ -70,6 +73,7 @@ class AttendanceSeeder extends Seeder
                     'location_id'           => $location->id,
                     'notes'                 => $faker->optional()->sentence(),
                     'company_id'            => $companyId,
+                    'department_id'         => $employee->department_id,
                     'work_schedule_type_id' => $location->work_schedule_type_id,
                     'created_by'            => $employee->user_id,
                     'updated_by'            => $employee->user_id,

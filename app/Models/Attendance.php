@@ -27,6 +27,7 @@ class Attendance extends Model
     // ];
     protected $fillable = [
         'employee_id',
+        'employee_number',
         'ic_number',
         'name',
         'date_of_month',
@@ -39,13 +40,14 @@ class Attendance extends Model
         'location_id',
         'notes',
         'company_id',
+        'department_id',
         'work_schedule_type_id',
         'created_by',
         'updated_by',
         'latitude',
         'longitude',
         'status'
-    ];    
+    ];
 
     protected $dates = ['check_in_time', 'check_out_time'];
 
@@ -63,6 +65,11 @@ class Attendance extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 
     public function workScheduleType()

@@ -26,9 +26,9 @@ class EmployeeController extends Controller
         $search = $request->input('search');
 
         $employees = Employee::with(['company', 'department'])
-            ->when($search, fn ($query) =>
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%"))
+            ->when($search, fn($query) =>
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%"))
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
@@ -50,7 +50,7 @@ class EmployeeController extends Controller
         return Inertia::render('employees/create', [
             'companies' => Company::select('id', 'company_name')->get(),
             'departments' => Department::select('id', 'name')->get(),
-                    'users' => $users,
+            'users' => $users,
             'locations' => Location::select('id', 'name')->get(),
         ]);
     }
@@ -58,6 +58,7 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'employee_number' => 'required|string|max:255',
             'ic_number' => 'required|string|max:20',
             'name' => 'required|unique:employees,name',
             'email' => 'required|email|max:255|unique:employees,email',
@@ -104,6 +105,7 @@ class EmployeeController extends Controller
     public function update(Request $request, Employee $employee)
     {
         $validated = $request->validate([
+            'employee_number' => 'required|string|max:255',
             'ic_number' => 'required|string|max:20',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:employees,email,' . $employee->id,

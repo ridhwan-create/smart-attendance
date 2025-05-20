@@ -7,6 +7,7 @@ import Pagination from '@/components/ui/pagination';
 import type { BreadcrumbItem, Department } from '@/types';
 import type { PaginatedData } from '@/types/pagination';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -25,6 +26,13 @@ export default function DepartmentIndex({ departments, filters }: PageProps) {
         search: filters.search || '',
     });
 
+    const { auth } = usePage().props as any;
+    const userPermissions: string[] = auth?.permissions ?? [];
+
+    const canCreate = userPermissions.includes('create departments');
+    const canEdit = userPermissions.includes('edit departments');
+    // const canDelete = userPermissions.includes('delete departments');
+
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -41,11 +49,13 @@ export default function DepartmentIndex({ departments, filters }: PageProps) {
             <div className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-xl font-semibold">Departments</h1>
-                    <Button asChild variant="success" className="rounded p-3">
-                        <Link href={route('departments.create')}>
-                            + Add Department
-                        </Link>
-                    </Button>
+                    {canCreate && (
+                        <Button asChild variant="success" className="rounded p-3">
+                            <Link href={route('departments.create')}>
+                                + Add Department
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 <form onSubmit={handleSearch} className="flex items-center gap-2">
@@ -89,12 +99,14 @@ export default function DepartmentIndex({ departments, filters }: PageProps) {
                                             >
                                                 <Eye className="w-4 h-4" />
                                             </Link>
-                                            <Link
-                                                href={route('departments.edit', department.id)}
-                                                className="text-yellow-600 hover:underline"
-                                            >
-                                                <Pencil className="w-4 h-4" />
-                                            </Link>
+                                            {canEdit && (
+                                                <Link
+                                                    href={route('departments.edit', department.id)}
+                                                    className="text-yellow-600 hover:underline"
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </Link>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
